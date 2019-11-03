@@ -1,0 +1,15 @@
+Groupe.cpp: In member function 'virtual Entite& Groupe::creerEnfant(std::__cxx11::string)':
+Groupe.cpp:10:8: error: 'Exception' was not declared in this scope
+  throw Exception("oups");
+        ^~~~~~~~~
+Groupe.cpp:11:1: warning: no return statement in function returning non-void [-Wreturn-type]
+ }
+ ^
+Groupe.cpp: In member function 'virtual Entite& Groupe::creerEnfant()':
+Groupe.cpp:14:8: error: 'Exception' was not declared in this scope
+  throw Exception("oups");
+        ^~~~~~~~~
+Groupe.cpp:15:1: warning: no return statement in function returning non-void [-Wreturn-type]
+ }
+ ^
+make: *** [Groupe.o] Error 1
