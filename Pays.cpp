@@ -3,9 +3,6 @@
 #include "Ville.hpp"
 
 Pays::Pays(std::string nom,Monde& monde) : Entite(nom,monde) {
-	/*_nom = nom;
-	_monde = monde;
-	genererGentile(nom,&ms,&mp,&fs,&fp);*/
 	int nbVilles = randomInt(2,10);
 	for(int i = 0;i < nbVilles;i++){
 		creerEnfant();

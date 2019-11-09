@@ -2,6 +2,7 @@
 #include <emscripten/bind.h>
 #include <emscripten/val.h>
 #include <emscripten/html5.h>
+
 #include <iostream>
 
 #include "Personne.hpp"
@@ -81,6 +82,8 @@ char cal[] = "calendrier";
 int main(){
 	emscripten::val document = emscripten::val::global("document");
 	
+	document.set("title",std::string("Générateur"));
+	
 	emscripten::val afficher = document.call<emscripten::val>("createElement",emscripten::val("div"));
 	afficher.set("id","afficher");
 	
@@ -150,10 +153,10 @@ int main(){
 	document["body"].set("innerText","");
 	document["body"].call<void>("append",afficher);
 	
-	std::cout << emscripten_set_mousedown_callback("#onglet_historique",hist,false,onglet_click) << std::endl;
-	std::cout << emscripten_set_mousedown_callback("#onglet_politique",pol,false,onglet_click) << std::endl;
-	std::cout << emscripten_set_mousedown_callback("#onglet_ecologie",eco,false,onglet_click) << std::endl;
-	std::cout << emscripten_set_mousedown_callback("#onglet_calendrier",cal,false,onglet_click) << std::endl;
+	/*std::cout << */emscripten_set_mousedown_callback("#onglet_historique",hist,false,onglet_click)/* << std::endl*/;
+	/*std::cout << */emscripten_set_mousedown_callback("#onglet_politique",pol,false,onglet_click)/* << std::endl*/;
+	/*std::cout << */emscripten_set_mousedown_callback("#onglet_ecologie",eco,false,onglet_click)/* << std::endl*/;
+	/*std::cout << */emscripten_set_mousedown_callback("#onglet_calendrier",cal,false,onglet_click)/* << std::endl*/;
 	
 	//EM_ASM(Module['noExitRuntime'] = true);
 	//emscripten::val::global("Module").set("noExitRuntime",true);

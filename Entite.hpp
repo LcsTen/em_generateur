@@ -13,20 +13,21 @@ class Entite{
 		std::string mp;
 		std::string fs;
 		std::string fp;
-		//Entite _parent;
+		Entite& _parent;
 	
 	protected:
 		std::vector<Entite*> enfants;
 	
 	public:
 		Entite(std::string nom,Entite& parent);
-		//Entite(Entite& parent);
+		Entite(Entite& parent);
 		virtual ~Entite();
 		
 		virtual Entite* creerEnfant(std::string nom) = 0;
 		virtual Entite* creerEnfant() = 0;
 		
 		virtual int getPopulation() const = 0;
+		Entite& getParent();
 		
 		virtual std::string toString() const;
 		

@@ -5,8 +5,6 @@
 #include <iostream>
 
 Monde::Monde(std::string nom) : Entite(nom,*this) {
-	/*nom = nom;
-	genererGentile(nom,&ms,&mp,&fs,&fp);*/
 	int nbPays = randomInt(2,10);
 	for(int i = 0;i < nbPays;i++){
 		creerEnfant();

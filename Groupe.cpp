@@ -3,8 +3,6 @@
 #include <iostream>
 
 Groupe::Groupe(std::string nom,Ville& ville) : Entite(nom,ville) {
-	/*_nom = nom;
-	_ville = ville;*/
 	population = randomInt(1000,10000);
 }
 	

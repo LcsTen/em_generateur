@@ -3,8 +3,6 @@
 #include "Groupe.hpp"
 
 Ville::Ville(std::string nom,Pays& pays) : Entite(nom,pays) {
-	/*_nom = nom;
-	_pays = pays;*/
 	int nbGroupes = randomInt(2,10);
 	for(int i = 0;i < nbGroupes;i++){
 		creerEnfant();
