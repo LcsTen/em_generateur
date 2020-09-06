@@ -1,62 +1,79 @@
-all: main
+### How to use
+
+## Rules
+
+# all: Default rule, build the target
+# run: Run the target. If WEB == 0, execute the generated executable, if WEB == 1, launch main.html using emrun.
+# clean: Delete all files related to the building, *.exe, *.js, *.wasm and *.o
+
+## Variables
+
+# WEB: if 1, build/run web target using emscripten, else build/run desktop target
+# CXX: compiler to be used. Forced to em++ if WEB == 1
+# FLAGS: additional flags to be passed to the compiler (the hardcoded flags takes priority though)
+# DEBUG: if 1, build for debugging (keep debug info), else build for release (optimize)
+
+### Variables
+
+CXXFLAGS := $(FLAGS)
+CXXFLAGS += -Wall -Wextra -Wshadow -Werror
+
+DEBUG ?= 0
+ifeq ($(DEBUG),0)
+	CXXFLAGS += -O2
+endif
+
+CXXFLAGS += -std=c++11
+
+WEB ?= 0
+ifeq ($(WEB),1)
+	obj_dir = obj/web
+	CXX = em++
+else
+	obj_dir = obj/desktop
+	CXX ?= g++
+	ifeq ($(DEBUG),1)
+		CXXFLAGS += -g -Og
+	endif
+endif
+CXXFLAGS += -DWEB=$(WEB)
+
+$(shell mkdir -p $(obj_dir))
+
+sources := $(wildcard src/*.cpp)
+objs := $(sources:src/%.cpp=$(obj_dir)/%.o)
+
+### Rules
+
+.PHONY: all run clean
+
+all: main main.js
 
 
-main: main.cpp Personne.o Monde.o Pays.o Ville.o Groupe.o Entite.o general.o
-	g++ -Wall -o main main.cpp Personne.o Monde.o Pays.o Ville.o Groupe.o Entite.o general.o
+main: $(objs)
+ifeq ($(WEB),0)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+ifeq ($(DEBUG),0)
+	strip $@
+endif
+endif
+	
+main.js: $(objs)
+ifeq ($(WEB),1)
+	$(CXX) $(CXXFLAGS) --emrun --bind -o $@ $^
+endif
 
-Personne.o: Personne.cpp
-	g++ -Wall -c Personne.cpp
-	
-Monde.o: Monde.cpp
-	g++ -Wall -c Monde.cpp
-	
-Pays.o: Pays.cpp
-	g++ -Wall -c Pays.cpp
-	
-Ville.o: Ville.cpp
-	g++ -Wall -c Ville.cpp
-	
-Groupe.o: Groupe.cpp
-	g++ -Wall -c Groupe.cpp
+$(obj_dir)/%.o: src/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $^
 
-Entite.o: Entite.cpp
-	g++ -Wall -c Entite.cpp
-	
-general.o: general.cpp
-	g++ -Wall -c general.cpp
-	
+ifeq ($(WEB),0)
 run: main
-	./main
-
-
-
-main.html: main.cpp emPersonne.o emMonde.o emPays.o emVille.o emGroupe.o emEntite.o em_general.o
-	em++ -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR -std=c++11 --emrun --bind -Wall -o main.html em_main.cpp emPersonne.o emMonde.o emPays.o emVille.o emGroupe.o emEntite.o em_general.o
-
-emPersonne.o: Personne.cpp
-	em++ -std=c++11 -Wall -c -o emPersonne.o Personne.cpp
-
-emMonde.o: Monde.cpp
-	em++ -std=c++11 -Wall -c -o emMonde.o Monde.cpp
+	./$^
+else
+run: main.js
+	- emrun main.html
+endif
 	
-emPays.o: Pays.cpp
-	em++ -std=c++11 -Wall -c -o emPays.o Pays.cpp
-	
-emVille.o: Ville.cpp
-	em++ -std=c++11 -Wall -c -o emVille.o Ville.cpp
-	
-emGroupe.o: Groupe.cpp
-	em++ -std=c++11 -Wall -c -o emGroupe.o Groupe.cpp
-
-emEntite.o: Entite.cpp
-	em++ -std=c++11 -Wall -c -o emEntite.o Entite.cpp
-
-em_general.o: general.cpp
-	em++ -std=c++11 -Wall -c -o em_general.o general.cpp
-
-run_web: main.html
-	emrun main.html
-	
-
 clean:
-	rm *.exe *.o *.html *.js *.wasm
+	- rm *.exe *.js *.wasm
+	- rm -r obj
