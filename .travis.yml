@@ -7,8 +7,8 @@ env:
 
 before_install:
   - git clone https://github.com/emscripten-core/emsdk
-  - emscripten/emsdk install latest
-  - emscripten/emsdk activate latest
+  - emsdk/emsdk install latest
+  - emsdk/emsdk activate latest
 
 script:
     # mettez ici compilation et génération de documentation
