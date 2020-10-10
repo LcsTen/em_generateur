@@ -7,6 +7,7 @@
 #include "general.h"
 #include "Entite.h"
 #include "Map.h"
+#include "Ecology.h"
 
 class Monde : public Entite{
 	private:

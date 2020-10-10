@@ -1,5 +1,7 @@
-#include <random>
 #include "general.h"
+
+#include <random>
+#include <algorithm>
 
 std::string voyPond = "aaaaaaaeeeeeeeeeeeeeeiiiiiiiooooouuuuuyAAAAAAAEEEEEEEEEEEEEEIIIIIIIOOOOOUUUUUY";
 std::string consPond = "bcccddddfghjklllllmmmnnnnnnpprrrrrrsssssssttttttvwxzBCCCDDDDFGHJKLLLLLMMMNNNNNNPPRRRRRRSSSSSSSTTTTTTVWXZ";

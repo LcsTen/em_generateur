@@ -1,13 +1,18 @@
 #ifndef living_group_h
 #define living_group_h
 
+#include <stddef.h>
+
+#include "Living.h"
+#include "Tile.h"
+
 enum class Position{
 	NOWHERE = 0,
 	NORTH,
 	EAST,
 	SOUTH,
 	WEST
-}
+};
 
 class LivingGroup{
 	private:

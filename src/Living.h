@@ -10,7 +10,7 @@ class Living{
 		int hunting;
 		int stealth;
 		int intelligence;
-		std::vector<Trait&> traits;
+		std::vector<Trait> traits;
 		
 		void addRandom();
 		void removeRandom();
@@ -18,7 +18,7 @@ class Living{
 		void checkTraitAdd(const Trait& trait,int multiplier = 1);
 	
 	public:
-		Living(const std::vector<Trait&>& pTraits);
+		Living(const std::vector<Trait>& pTraits);
 		Living();
 		
 		void mutate();

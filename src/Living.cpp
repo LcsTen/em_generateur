@@ -1,6 +1,8 @@
 #include "Living.h"
 
-Creature::Creature(const std::vector<Trait&>& pTraits) : traits(pTraits){
+#include "general.h"
+
+Living::Living(const std::vector<Trait>& pTraits) : traits(pTraits){
 	size = 1;
 	strength = 1;
 	hunting = 1;
@@ -8,13 +10,13 @@ Creature::Creature(const std::vector<Trait&>& pTraits) : traits(pTraits){
 	intelligence = 1;
 	//complexity = traits.size();
 	for(const Trait& trait : traits){
-		checkAddTrait(trait);
+		checkTraitAdd(trait);
 	}
 }
 
-Creature::Creature() : Creature({});
+Living::Living() : Living(std::vector<Trait>{}) {};
 
-void checkTraitAdd(const Trait& trait,int mult){
+void Living::checkTraitAdd(const Trait& trait,int mult){
 	if(trait.hasFlag(TraitFlag::SIZE)){
 		size += mult;
 	}
@@ -32,7 +34,7 @@ void checkTraitAdd(const Trait& trait,int mult){
 	}
 }
 
-void Creature::mutate(){
+void Living::mutate(){
 	if(traits.empty()){
 		addRandom();
 	}else if(traits.size() == Trait::getAllTraits().size()){
@@ -45,48 +47,48 @@ void Creature::mutate(){
 }
 
 // For a trait to be added, the creature must have all the necessary prerequisites
-void Creature::addRandom(){
-	std::vector<Trait&> candidates;
+void Living::addRandom(){
+	std::vector<Trait> candidates;
 	for(const Trait& trait : Trait::getAllTraits()){
-		if(traits.find(trait) == traits.end()){
+		if(find(traits,trait) == traits.end()){
 			bool ok = true;
 			for(const Trait& prerequisite : trait.getPrerequisites()){
-				ok &= (traits.find(prerequisite) != traits.end());
+				ok &= (find(traits,prerequisite) != traits.end());
 			}
 			if(ok){
 				candidates.push_back(trait);
 			}
 		}
 	}
-	addTrait(candidates[randomInt(candidats.size())]);
+	addTrait(candidates[randomInt(candidates.size())]);
 }
 
 // For a trait to be removed, it musn't be a prerequisite for another trait
-void Creature::removeRandom(){
-	std::vector<Trait&> candidates;
+void Living::removeRandom(){
+	std::vector<Trait> candidates;
 	for(const Trait& toBeRemoved : traits){
 		bool ok = true;
 		for(const Trait& aTrait : traits){
-			const std::vector<Trait&>& prerequisites = aTrait.getPrerequisites();
-			ok &= (prerequisites.find(toBeRemoved) == prerequisites.end());
+			const std::vector<Trait>& prerequisites = aTrait.getPrerequisites();
+			ok &= (find(prerequisites,toBeRemoved) == prerequisites.end());
 		}
 		if(ok){
 			candidates.push_back(toBeRemoved);
 		}
 	}
-	removeTrait(candidates[randomInt(candidats.size())]);
+	removeTrait(candidates[randomInt(candidates.size())]);
 }
 
-void Creature::addTrait(const Trait& trait){
-	if(traits.find(trait) != traits.end()){
+void Living::addTrait(const Trait& trait){
+	if(find(traits,trait) != traits.end()){
 		return;
 	}
 	traits.push_back(trait);
 	checkTraitAdd(trait);
 }
 
-void Creature::removeTrait(const Trait& trait){
-	std::vector<Trait&>::iterator it = traits.find(trait);
+void Living::removeTrait(const Trait& trait){
+	std::vector<Trait>::const_iterator it = find(traits,trait);
 	if(it == traits.end()){
 		return;
 	}
@@ -94,22 +96,22 @@ void Creature::removeTrait(const Trait& trait){
 	checkTraitAdd(trait,-1);
 }
 
-int Creature::getSize() const{
+int Living::getSize() const{
 	return size;
 }
 
-int Creature::getStrength() const{
+int Living::getStrength() const{
 	return strength;
 }
 
-int Creature::getHunting() const{
+int Living::getHunting() const{
 	return hunting;
 }
 
-int Creature::getStealth() const{
+int Living::getStealth() const{
 	return stealth;
 }
 
-int Creature::getComplexity() const{
+int Living::getComplexity() const{
 	return traits.size();
 }
