@@ -9,7 +9,7 @@ before_install:
   - git clone https://github.com/emscripten-core/emsdk
   - emsdk/emsdk install latest
   - emsdk/emsdk activate latest
-  - emsdk/emsdk_env.sh
+  - . emsdk/emsdk_env.sh
 
 script:
     # mettez ici compilation et génération de documentation
@@ -17,6 +17,7 @@ script:
     - rm -rf obj # Clean intermediate compilation files
     - mkdir -p gh-pages # Create gh-pages directory (local-dir)
     - mv main.{html,js,wasm} gh-pages # Move the resulting files to that directory
+
 deploy:
   # section de configuration des github pages
   provider: pages
