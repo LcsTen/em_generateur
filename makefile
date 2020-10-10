@@ -12,6 +12,7 @@
 # CXX: compiler to be used. Forced to em++ if WEB == 1
 # FLAGS: additional flags to be passed to the compiler (the hardcoded flags takes priority though)
 # DEBUG: if 1, build for debugging (keep debug info), else build for release (optimize)
+# GENERATE 
 
 ### Variables
 
@@ -47,7 +48,7 @@ objs := $(sources:src/%.cpp=$(obj_dir)/%.o)
 
 .PHONY: all run clean
 
-all: main main.js
+all: main main.html
 
 
 main: $(objs)
@@ -58,7 +59,7 @@ ifeq ($(DEBUG),0)
 endif
 endif
 	
-main.js: $(objs)
+main.js main.html: $(objs)
 ifeq ($(WEB),1)
 	$(CXX) $(CXXFLAGS) --emrun --bind -o $@ $^
 endif

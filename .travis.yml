@@ -1,0 +1,28 @@
+sudo: required
+
+env:
+# section utile pour vos variables d'environnement.
+# /!\ N'Y METTEZ PAS d'informations sensibles !
+# pour cela, utilisez les fonctionnalités de Travis CI
+
+before_install:
+  - git clone https://github.com/emscripten-core/emsdk
+  - emscripten/emsdk install latest
+  - emscripten/emsdk activate latest
+
+script:
+    # mettez ici compilation et génération de documentation
+    - make WEB=1 main.html # Compile files
+    - rm -rf obj # Clean intermediate compilation files
+    - mkdir -p gh-pages # Create gh-pages directory (local-dir)
+    - mv {,gh-pages}/main.{html,js,wasm} # Move the resulting files to that directory
+deploy:
+  # section de configuration des github pages
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN
+  keep-history: true
+  committer-from-gh: true
+  local-dir: gh-pages
+  on:
+    branch: master
