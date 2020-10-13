@@ -64,9 +64,6 @@ ifeq ($(WEB),1)
 	$(CXX) $(CXXFLAGS) --emrun --bind -o $@ $^
 endif
 
-$(obj_dir)/%.o: src/%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $^
-
 ifeq ($(WEB),0)
 run: main
 	./$^
@@ -78,3 +75,9 @@ endif
 clean:
 	- rm *.exe *.js *.wasm
 	- rm -r obj
+
+.SECONDEXPANSION:
+
+# The prerequisites are the .cpp source file and all included .h files.
+$(obj_dir)/%.o: src/%.cpp $$(addprefix src/,$$(shell sed -n 's/^ *\# *include *"\(.*\)"/\1/p' src/$$*.cpp))
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
