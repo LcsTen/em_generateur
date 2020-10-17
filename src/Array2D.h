@@ -1,7 +1,7 @@
 #ifndef array_2d_h
 #define array_2d_h
 
-#include <stddef.h>
+#include <stddef.h> // size_t
 
 template<typename T>
 class Array2D{

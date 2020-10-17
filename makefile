@@ -12,19 +12,17 @@
 # CXX: compiler to be used. Forced to em++ if WEB == 1
 # FLAGS: additional flags to be passed to the compiler (the hardcoded flags takes priority though)
 # DEBUG: if 1, build for debugging (keep debug info), else build for release (optimize)
-# GENERATE 
 
 ### Variables
 
-CXXFLAGS := $(FLAGS)
-CXXFLAGS += -Wall -Wextra -Wshadow -Werror
+override CXXFLAGS += -Wall -Wextra -Wshadow -Werror
 
 DEBUG ?= 0
 ifeq ($(DEBUG),0)
-	CXXFLAGS += -O2
+	override CXXFLAGS += -O2
 endif
 
-CXXFLAGS += -std=c++11
+override CXXFLAGS += -std=c++11
 
 WEB ?= 0
 ifeq ($(WEB),1)
@@ -34,10 +32,10 @@ else
 	obj_dir = obj/desktop
 	CXX ?= g++
 	ifeq ($(DEBUG),1)
-		CXXFLAGS += -g -Og
+		override CXXFLAGS += -g -Og
 	endif
 endif
-CXXFLAGS += -DWEB=$(WEB)
+override CXXFLAGS += -DWEB=$(WEB)
 
 $(shell mkdir -p $(obj_dir))
 
@@ -58,7 +56,7 @@ ifeq ($(DEBUG),0)
 	strip $@
 endif
 endif
-	
+
 main.js main.html: $(objs)
 ifeq ($(WEB),1)
 	$(CXX) $(CXXFLAGS) --emrun --bind -o $@ $^
@@ -71,10 +69,10 @@ else
 run: main.js
 	- emrun main.html
 endif
-	
+
 clean:
-	- rm *.exe *.js *.wasm
-	- rm -r obj
+	rm -f *.exe *.js *.wasm
+	rm -rf obj
 
 .SECONDEXPANSION:
 

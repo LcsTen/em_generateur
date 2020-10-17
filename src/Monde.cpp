@@ -1,8 +1,7 @@
 #include "Monde.h"
 
 #include "Pays.h"
-
-#include <iostream>
+#include "general.h"
 
 Monde::Monde(std::string nom,size_t lin,size_t col) : Entite(nom,*this), map(lin,col){
 	int nbPays = randomInt(2,10);

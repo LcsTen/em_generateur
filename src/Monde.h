@@ -2,9 +2,7 @@
 #define monde_h
 
 #include <string>
-#include <vector>
 
-#include "general.h"
 #include "Entite.h"
 #include "Map.h"
 #include "Ecology.h"

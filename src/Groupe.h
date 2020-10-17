@@ -2,8 +2,7 @@
 #define groupe_h
 
 #include <string>
-#include <vector>
-#include "general.h"
+
 #include "Entite.h"
 #include "Ville.h"
 

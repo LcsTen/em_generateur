@@ -2,8 +2,7 @@
 #define pays_h
 
 #include <string>
-#include <vector>
-#include "general.h"
+
 #include "Monde.h"
 #include "Entite.h"
 

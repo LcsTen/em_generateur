@@ -1,6 +1,7 @@
 #include "Pays.h"
 
 #include "Ville.h"
+#include "general.h"
 
 Pays::Pays(std::string nom,Monde& monde) : Entite(nom,monde) {
 	int nbVilles = randomInt(2,10);

@@ -1,5 +1,4 @@
-#include <stdexcept>
-#include <iostream>
+#include <stdexcept> // std::out_of_range
 
 template<typename T>
 Array2D<T>::Array2D(size_t pLin,size_t pCol) : lin(pLin), col(pCol){

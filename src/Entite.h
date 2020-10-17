@@ -3,12 +3,9 @@
 
 #include <string>
 #include <vector>
-#include <iostream>
-#include "general.h"
+#include <iostream> // std::ostream
 
-enum GP{
-	MS,MP,FS,FP
-};
+#include "Genre.h"
 
 class Entite{
 	private:
@@ -37,7 +34,7 @@ class Entite{
 		std::string getMp() const;
 		std::string getFs() const;
 		std::string getFp() const;
-		std::string getGent(GP gp) const;
+		std::string getGent(Genre gp) const;
 		int getNbEnfants() const;
 		Entite* getEnfant(unsigned int n) const;
 		

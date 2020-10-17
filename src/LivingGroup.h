@@ -1,7 +1,7 @@
 #ifndef living_group_h
 #define living_group_h
 
-#include <stddef.h>
+#include <stddef.h> // size_t
 
 #include "Living.h"
 #include "Tile.h"

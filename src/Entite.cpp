@@ -1,5 +1,7 @@
 #include "Entite.h"
 
+#include "general.h"
+
 Entite::Entite(std::string nom,Entite& parent) : _nom(nom), _parent(parent) {
 	genererGentile(nom,&ms,&mp,&fs,&fp);
 }
@@ -32,7 +34,7 @@ std::string Entite::getFs() const{
 std::string Entite::getFp() const{
 	return fp;
 }
-std::string Entite::getGent(GP gp) const{
+std::string Entite::getGent(Genre gp) const{
 	switch(gp){
 		case MS: return ms;
 		case MP: return mp;
