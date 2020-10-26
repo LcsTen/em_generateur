@@ -5,3 +5,4 @@ obj/
 *.js
 *.wasm
 *.exe
+*.d

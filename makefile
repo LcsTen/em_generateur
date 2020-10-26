@@ -41,13 +41,13 @@ $(shell mkdir -p $(obj_dir))
 
 sources := $(wildcard src/*.cpp)
 objs := $(sources:src/%.cpp=$(obj_dir)/%.o)
+includes := $(sources:src/%.cpp=%.d)
 
 ### Rules
 
 .PHONY: all run clean
 
 all: main main.html
-
 
 main: $(objs)
 ifeq ($(WEB),0)
@@ -71,11 +71,17 @@ run: main.js
 endif
 
 clean:
-	rm -f *.exe *.js *.wasm
+	rm -f *.exe *.js *.wasm *.d
 	rm -rf obj
 
-.SECONDEXPANSION:
+%.d: src/%.cpp
+	@set -e; rm -f $@; \
+	$(CXX) -MM $(CPPFLAGS) $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,$(obj_dir)/\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
 
-# The prerequisites are the .cpp source file and all included .h files.
-$(obj_dir)/%.o: src/%.cpp $$(addprefix src/,$$(shell sed -n 's/^ *\# *include *"\(.*\)"/\1/p' src/$$*.cpp))
+include $(includes)
+
+#Prerequisites are generated in the above includes
+$(obj_dir)/%.o:
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
