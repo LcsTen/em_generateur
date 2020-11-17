@@ -1,25 +1,23 @@
 sudo: required
 
-env:
-# section utile pour vos variables d'environnement.
-# /!\ N'Y METTEZ PAS d'informations sensibles !
-# pour cela, utilisez les fonctionnalités de Travis CI
+language: c++
+
+dist: "bionic"
 
 before_install:
   - git clone https://github.com/emscripten-core/emsdk
   - emsdk/emsdk install latest
   - emsdk/emsdk activate latest
   - . emsdk/emsdk_env.sh
+  - python3 --version
 
 script:
-    # mettez ici compilation et génération de documentation
     - make WEB=1 main.html # Compile files
     - rm -rf obj # Clean intermediate compilation files
     - mkdir -p gh-pages # Create gh-pages directory (local-dir)
     - mv main.{html,js,wasm} gh-pages # Move the resulting files to that directory
 
 deploy:
-  # section de configuration des github pages
   provider: pages
   skip-cleanup: true
   github-token: $GITHUB_TOKEN
