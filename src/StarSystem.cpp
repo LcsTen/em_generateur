@@ -4,14 +4,14 @@
 #include "GasPlanet.h"
 #include "TelluricPlanet.h"
 
-#include <math.h>
+#include <cmath>
 #include <iostream>
 
 StarSystem::StarSystem(std::string n) : name(n){
 	// Number of stars
 	double proba = randouble();
 	size_t nbStars = 0;
-	while(proba < 1/std::pow(nbStars+1,2)){
+	while(proba < 1/pow(nbStars+1,2)){
 		nbStars++;
 	}
 	
@@ -134,7 +134,7 @@ std::vector<World*> StarSystem::getHabitableWorlds(){
 		TelluricPlanet* planet = (TelluricPlanet*)world;
 		double albedo = 0.3;
 		size_t atmosphereDensity = planet->getAtmosphereDensity();
-		double planetMultiplier = std::pow(1-albedo,1.0/4)*std::pow(1.0+atmosphereDensity,1.0/4);
+		double planetMultiplier = pow(1-albedo,1.0/4)*pow(1.0+atmosphereDensity,1.0/4);
 		size_t hottest;
 		// nullptr means circumbinary
 		AstralObject* orbiting = planet->getOrbiting();
@@ -151,7 +151,7 @@ std::vector<World*> StarSystem::getHabitableWorlds(){
 			for(size_t j = 0;j < stars.size();j++){
 				size_t starTemp = stars[j]->getTemperature();
 				size_t starRadius = stars[j]->getRadius();
-				size_t temperature = starTemp*std::sqrt(starRadius/(2.0*distance));
+				size_t temperature = starTemp*sqrt(starRadius/(2.0*distance));
 				if(temperature > hottest){
 					hottest = temperature;
 				}
@@ -174,14 +174,14 @@ std::vector<World*> StarSystem::getHabitableWorlds(){
 				size_t starTemp = companion->getTemperature();
 				size_t starRadius = companion->getRadius();
 				size_t distanceCompanion = companions[j].second - distanceSun;
-				size_t temperature = starTemp*std::sqrt(starRadius/(2.0*distanceCompanion));
+				size_t temperature = starTemp*sqrt(starRadius/(2.0*distanceCompanion));
 				if(temperature > hottest){
 					hottest = temperature;
 				}
 			}
 			size_t starTemp = sun->getTemperature();
 			size_t starRadius = sun->getRadius();
-			hottest += starTemp*std::sqrt(starRadius/(2.0*distanceSun));
+			hottest += starTemp*sqrt(starRadius/(2.0*distanceSun));
 		}
 		hottest *= planetMultiplier;
 		planet->setHottestTemperature(hottest);
@@ -202,7 +202,7 @@ std::vector<World*> StarSystem::getHabitableWorlds(){
 			// Orbiting planet is eclipsing the star(s) of satellite: coldest case
 			// First step: get planet temperature
 			size_t planetTemp;
-			size_t orbitingMultiplier = std::pow(1-0.3,1.0/4)*std::pow(1.0+orbitDensity,1.0/4);
+			size_t orbitingMultiplier = pow(1-0.3,1.0/4)*pow(1.0+orbitDensity,1.0/4);
 			if(o->getOrbiting() == nullptr){
 				// Orbiting planet is circumbinary: get the coldest star
 				size_t coldestStar = -1;
@@ -211,7 +211,7 @@ std::vector<World*> StarSystem::getHabitableWorlds(){
 					Star* star = stars[j];
 					size_t starTemp = star->getTemperature();
 					size_t starRadius = star->getRadius();
-					size_t temperature = starTemp*std::sqrt(starRadius/(2.0*distance));
+					size_t temperature = starTemp*sqrt(starRadius/(2.0*distance));
 					if(temperature < coldestStar){
 						coldestStar = temperature;
 					}
@@ -222,9 +222,9 @@ std::vector<World*> StarSystem::getHabitableWorlds(){
 				size_t starTemp = sun->getTemperature();
 				size_t starRadius = sun->getRadius();
 				size_t distance = o->getDistance();
-				planetTemp = starTemp*std::sqrt(starRadius/(2.0*distance))*orbitingMultiplier;
+				planetTemp = starTemp*sqrt(starRadius/(2.0*distance))*orbitingMultiplier;
 			}
-			coldest = planetTemp*std::sqrt(o->getRadius()/(2.0*planet->getDistance()));
+			coldest = planetTemp*sqrt(o->getRadius()/(2.0*planet->getDistance()));
 		}else if(orbiting == nullptr){
 			// Coldest star is the closest to circumbinary planet: coldest case
 			coldest = -1;
@@ -232,7 +232,7 @@ std::vector<World*> StarSystem::getHabitableWorlds(){
 			for(size_t j = 0;j < stars.size();j++){
 				size_t starTemp = stars[j]->getTemperature();
 				size_t starRadius = stars[j]->getRadius();
-				size_t temperature = starTemp*std::sqrt(starRadius/(2.0*distance));
+				size_t temperature = starTemp*sqrt(starRadius/(2.0*distance));
 				if(temperature < coldest){
 					coldest = temperature;
 				}
@@ -243,7 +243,7 @@ std::vector<World*> StarSystem::getHabitableWorlds(){
 			size_t starTemp = sun->getTemperature();
 			size_t starRadius = sun->getRadius();
 			size_t distance = planet->getDistance();
-			coldest = starTemp*std::sqrt(starRadius/(2.0*distance));
+			coldest = starTemp*sqrt(starRadius/(2.0*distance));
 		}
 		coldest *= planetMultiplier;
 		planet->setColdestTemperature(coldest);
