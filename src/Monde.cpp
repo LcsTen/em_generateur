@@ -12,9 +12,9 @@ Monde::Monde(std::string nom,size_t lin,size_t col) : Entite(nom,*this), map(lin
 
 Monde::Monde(std::string nom) : Monde(nom,24,24) {}
 
-Monde::Monde(size_t lin,size_t col) : Monde(genererNom(10),lin,col) {}
+Monde::Monde(size_t lin,size_t col) : Monde(generateName(10),lin,col) {}
 
-Monde::Monde() : Monde(genererNom(10)) {}
+Monde::Monde() : Monde(generateName(10)) {}
 
 Entite* Monde::creerEnfant(std::string nom){
 	Pays* p = new Pays(nom,*this);
@@ -23,7 +23,7 @@ Entite* Monde::creerEnfant(std::string nom){
 }
 
 Entite* Monde::creerEnfant(){
-	return creerEnfant(genererNom(10));
+	return creerEnfant(generateName(10));
 } 
 
 int Monde::getPopulation() const{

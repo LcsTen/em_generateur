@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 #include "Personne.h"
 #include "Entite.h"
@@ -7,6 +8,9 @@
 #include "Pays.h"
 #include "Ville.h"
 #include "Groupe.h"
+#include "StarSystem.h"
+#include "GasPlanet.h"
+#include "TelluricPlanet.h"
 
 #if WEB == 1
 
@@ -262,13 +266,24 @@ int main(){
 
 #else // if WEB == 0
 
-Monde* monde = NULL;
+Monde* monde = nullptr;
+StarSystem* space = nullptr;
 
 void genererMonde(){
-	if(monde != NULL){
+	if(monde != nullptr){
 		delete monde;
 	}
-	monde = new Monde();
+	if(space != nullptr){
+		delete space;
+	}
+	space = new StarSystem();
+	std::vector<World*> habitables = space->getHabitableWorlds();
+	while(space->getHabitableWorlds().size() == 0){
+		delete space;
+		space = new StarSystem();
+		habitables = space->getHabitableWorlds();
+	}
+	monde = new Monde(habitables[0]->getName());
 	std::cout << *monde << std::endl;
 }
 
@@ -333,6 +348,115 @@ void map(){
 	}
 }
 
+void show(GasPlanet* planet,int depth = 0){
+	std::cout << std::string(depth,'\t') << planet->getName() << " (Gas)"
+		<< std::endl;
+}
+
+void show(TelluricPlanet* planet,int depth = 0){
+	TelluricPlanet* telluric = (TelluricPlanet*)planet;
+	size_t hottest = telluric->getHottestTemperature();
+	size_t coldest = telluric->getColdestTemperature();
+	if(hottest > 175 && hottest < 371 && coldest > 175 && coldest < 371){
+		// Temperature is always fine: planet is habitable
+		std::cout << "\e[32m";
+	}else if(hottest >= 371 && coldest <= 175){
+		// Temperature is too extreme
+		std::cout << "\e[35m";
+	}else if(hottest >= 371 && coldest >= 371){
+		// Temperature is always too hot
+		std::cout << "\e[31m";
+	}else if(hottest >= 371 && coldest <= 371){
+		// Temperature is too hot in the hottest case
+		std::cout << "\e[91m";
+	}else if(coldest <= 175 && hottest <= 175){
+		// Temperature is always too cold
+		std::cout << "\e[34m";
+	}else if(coldest <= 175 && hottest >= 175){
+		// Temperature is too cold in the coldest case
+		std::cout << "\e[36m";
+	}
+	std::cout << std::string(depth,'\t') << planet->getName()
+		<< " (Telluric) [" << coldest << ';' << hottest << "]\e[0m"
+		<< std::endl;
+}
+
+void showSpace(){
+	std::vector<Star*> stars = space->getStars();
+	std::vector<World*> worlds = space->getWorlds();
+	std::vector<std::vector<std::pair<size_t,World*>>> planets(stars.size());
+	std::vector<std::vector<std::pair<size_t,World*>>> satellites(worlds.size());
+	std::vector<std::pair<size_t,World*>> circumbinaries;
+	for(size_t i = 0;i < worlds.size();i++){
+		AstralObject* orbiting = worlds[i]->getOrbiting();
+		if(orbiting == nullptr){
+			circumbinaries.push_back({i,worlds[i]});
+		}else if(orbiting->isStar()){
+			for(size_t j = 0;j < stars.size();j++){
+				if(orbiting == stars[j]){
+					planets[j].push_back({i,worlds[i]});
+				}
+			}
+		}else{
+			for(size_t j = 0;j < worlds.size();j++){
+				if(orbiting == worlds[j]){
+					satellites[j].push_back({i,worlds[i]});
+				}
+			}
+		}
+	}
+	auto cmp = [](std::pair<size_t,World*>& a,std::pair<size_t,World*>& b){
+		return a.second->getDistance() < b.second->getDistance();
+	};
+	for(size_t i = 0;i < planets.size();i++){
+		std::sort(planets[i].begin(),planets[i].end(),cmp);
+	}
+	for(size_t i = 0;i < satellites.size();i++){
+		std::sort(satellites[i].begin(),satellites[i].end(),cmp);
+	}
+	std::sort(circumbinaries.begin(),circumbinaries.end(),cmp);
+	
+	std::cout << space->getName() << " is a stellar system with " << stars.size() << " stars:" << std::endl;
+	for(size_t i = 0;i < stars.size();i++){
+		std::string starClass;
+		starClass += stars[i]->getStarClass()[0];
+		starClass += stars[i]->getStarClass()[1];
+		std::cout << '\t' << space->getName() << " " << (char)('A'+i) << " is a class "
+			<< starClass << " star ("
+			<< stars[i]->getTemperature() << "K)" << std::endl;
+		for(size_t j = 0;j < planets[i].size();j++){
+			World* planet = planets[i][j].second;
+			size_t indexPlanet = planets[i][j].first;
+			if(planet->isGasPlanet()){
+				show((GasPlanet*)planet,2);
+			}else{
+				show((TelluricPlanet*)planet,2);
+			}
+			for(size_t k = 0;k < satellites[indexPlanet].size();k++){
+				World* satellite = satellites[indexPlanet][k].second;
+				show((TelluricPlanet*)satellite,3);
+			}
+		}
+	}
+	std::cout << std::endl;
+	if(stars.size() > 1){
+		std::cout << "Circumbinaries:" << std::endl;
+	}
+	for(size_t i = 0;i < circumbinaries.size();i++){
+		World* planet = circumbinaries[i].second;
+		size_t indexPlanet = circumbinaries[i].first;
+		if(planet->isGasPlanet()){
+			show((GasPlanet*)planet,1);
+		}else{
+			show((TelluricPlanet*)planet,1);
+		}
+		for(size_t j = 0;j < satellites[indexPlanet].size();j++){
+			World* satellite = satellites[indexPlanet][j].second;
+			show((TelluricPlanet*)satellite,2);
+		}
+	}
+}
+
 int main(){
 	srand(time(NULL));
 	genererMonde();
@@ -376,10 +500,13 @@ int main(){
 			std::cout << "show [id_country [id_city]]" << std::endl << "\tShow information about the world/country/city."
 				<< std::endl << std::endl << "gen" << std::endl << "\tGenerate a new world."
 				<< std::endl << std::endl << "map" << std::endl << "\tShow the world map."
+				<< std::endl << std::endl << "space" << std::endl << "\tShow information about space."
 				<< std::endl << std::endl << "stop" << std::endl << "\tExit the REPL."
 				<< std::endl << std::endl << "help" << std::endl << "\tDisplay this help." << std::endl;
 		}else if(argv[0] == "map"){
 			map();
+		}else if(argv[0] == "space"){
+			showSpace();
 		}else if(argv[0] != ""){
 			std::cout << argv[0]+": unknown command." << std::endl;
 		}

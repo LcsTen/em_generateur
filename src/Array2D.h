@@ -13,9 +13,10 @@ class Array2D{
 	
 	public:
 		Array2D(size_t pLin,size_t pCol);
+		Array2D(const Array2D& other);
 		~Array2D();
 		
-		Array2D operator=(Array2D& other);
+		Array2D operator=(const Array2D& other);
 		
 		size_t lines() const;
 		size_t columns() const;

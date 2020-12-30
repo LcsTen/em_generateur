@@ -1,15 +1,36 @@
 #include <stdexcept> // std::out_of_range
 
+#include <iostream>
+
 template<typename T>
 Array2D<T>::Array2D(size_t pLin,size_t pCol) : lin(pLin), col(pCol){
 	size_t s = size();
 	if(s != 0){
 		data = new T[s];
 	}
+	//std::cout << "constructor: " << data << std::endl;
+}
+
+template<typename T>
+Array2D<T>::Array2D(const Array2D<T>& other){
+	if(data != nullptr){
+		delete[] data;
+		data = nullptr;
+	}
+	lin = other.lin;
+	col = other.col;
+	size_t oS = other.size();
+	if(oS != 0){
+		data = new T[oS];
+		for(size_t i = 0;i < oS;i++){
+			data[i] = other.data[i];
+		}
+	}
 }
 
 template<typename T>
 Array2D<T>::~Array2D(){
+	//std::cout << "destructor: " << data << std::endl;
 	if(data != nullptr){
 		delete[] data;
 		data = nullptr;
@@ -17,7 +38,7 @@ Array2D<T>::~Array2D(){
 }
 
 template<typename T>
-Array2D<T> Array2D<T>::operator=(Array2D<T>& other){
+Array2D<T> Array2D<T>::operator=(const Array2D<T>& other){
 	if(data != nullptr){
 		delete[] data;
 		data = nullptr;

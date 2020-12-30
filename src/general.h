@@ -9,9 +9,11 @@ int randomInt(int min,int max);
 
 int randomInt(int max);
 
+double randouble();
+
 void genererGentile(std::string nom,std::string* ms,std::string* mp,std::string* fs,std::string* fp);
 
-std::string genererNom(int longMax);
+std::string generateName(int longMax);
 
 template<typename T>
 typename std::vector<T>::const_iterator find(const std::vector<T>& vector,const T& needle){

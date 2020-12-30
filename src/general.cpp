@@ -15,6 +15,10 @@ int randomInt(int max){
 	return randomInt(0,max);
 }
 
+double randouble(){
+	return rand()/(double)RAND_MAX;
+}
+
 bool endsWith(std::string a,std::string b){
 	return (a.substr(a.size()-b.size(),b.size()) == b);
 }
@@ -240,7 +244,7 @@ void genererGentile(std::string nom,std::string* ms,std::string* mp,std::string*
 	}
 }
 	
-std::string genererNom(int longMax){
+std::string generateName(int longMax){
 	std::string res = "";
 	int alea = randomInt(2);
 	bool voyelle = (alea == 0);

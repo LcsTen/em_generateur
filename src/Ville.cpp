@@ -17,7 +17,7 @@ Entite* Ville::creerEnfant(std::string nom){
 }
 
 Entite* Ville::creerEnfant(){
-	return creerEnfant(genererNom(10));
+	return creerEnfant(generateName(10));
 }
 
 int Ville::getPopulation() const{
