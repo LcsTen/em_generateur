@@ -68,7 +68,7 @@ std::string format(int a){
 	std::string res = "";
 	int length = strlen(buf);
 	for(int i = 0;i < length;i++){
-		if(i % 3 == 0){
+		if(i % 3 == 0 && i != 0){
 			res = ' '+res;
 		}
 		res = buf[length-i-1]+res;
@@ -82,14 +82,16 @@ std::string operator+(std::string a,int b){
 
 void hideAll(){
 	emscripten::val document = emscripten::val::global("document");
-	document.call<emscripten::val>("querySelector","#historique"_val)["style"].set("display","none");
-	document.call<emscripten::val>("querySelector","#politique"_val)["style"].set("display","none");
-	document.call<emscripten::val>("querySelector","#ecologie"_val)["style"].set("display","none");
-	document.call<emscripten::val>("querySelector","#calendrier"_val)["style"].set("display","none");
-	document.call<emscripten::val>("querySelector","#onglet_historique"_val)["style"].set("backgroundColor","white");
-	document.call<emscripten::val>("querySelector","#onglet_politique"_val)["style"].set("backgroundColor","white");
-	document.call<emscripten::val>("querySelector","#onglet_ecologie"_val)["style"].set("backgroundColor","white");
-	document.call<emscripten::val>("querySelector","#onglet_calendrier"_val)["style"].set("backgroundColor","white");
+	document.call<emscripten::val>("querySelector","#history"_val)["style"].set("display","none");
+	document.call<emscripten::val>("querySelector","#politics"_val)["style"].set("display","none");
+	document.call<emscripten::val>("querySelector","#ecology"_val)["style"].set("display","none");
+	document.call<emscripten::val>("querySelector","#calendar"_val)["style"].set("display","none");
+	document.call<emscripten::val>("querySelector","#space"_val)["style"].set("display","none");
+	document.call<emscripten::val>("querySelector","#history_tab"_val)["style"].set("backgroundColor","white");
+	document.call<emscripten::val>("querySelector","#politics_tab"_val)["style"].set("backgroundColor","white");
+	document.call<emscripten::val>("querySelector","#ecology_tab"_val)["style"].set("backgroundColor","white");
+	document.call<emscripten::val>("querySelector","#calendar_tab"_val)["style"].set("backgroundColor","white");
+	document.call<emscripten::val>("querySelector","#space_tab"_val)["style"].set("backgroundColor","white");
 }
 
 EM_BOOL onglet_click(int /*eventType*/,const EmscriptenMouseEvent* /*e*/,void* userData){
@@ -97,18 +99,20 @@ EM_BOOL onglet_click(int /*eventType*/,const EmscriptenMouseEvent* /*e*/,void* u
 	hideAll();
 	emscripten::val document = emscripten::val::global("document");
 	document.call<emscripten::val>("querySelector",emscripten::val(std::string("#")+(char*)userData))["style"].set("display","block");
-	document.call<emscripten::val>("querySelector",emscripten::val(std::string("#onglet_")+(char*)userData))["style"].set("backgroundColor","yellow");
+	document.call<emscripten::val>("querySelector",emscripten::val(std::string("#")+(char*)userData+"_tab"))["style"].set("backgroundColor","yellow");
 	return 0;
 }
 
 void mainLoop(){}
 
-char hist[] = "historique";
-char pol[] = "politique";
-char eco[] = "ecologie";
-char cal[] = "calendrier";
+char hist[] = "history";
+char pol[] = "politics";
+char eco[] = "ecology";
+char cal[] = "calendar";
+char spa[] = "space";
 
-Monde* monde = NULL;
+Monde* monde = nullptr;
+StarSystem* space = nullptr;
 
 std::string entiteToHtml(Ville* ville){
 	return ville->getNom()+" ("+ville->getPopulation()+" "+ville->getGent(MP)+")";
@@ -130,11 +134,150 @@ std::string entiteToHtml(Monde* m){
 	return res;
 }
 
-void miseAJour(){
+std::string spaceToHtml(GasPlanet* g){
+	return g->getName()+" (Gas)";
+}
+
+void show(TelluricPlanet* planet,int depth = 0){
+	TelluricPlanet* telluric = (TelluricPlanet*)planet;
+	size_t hottest = telluric->getHottestTemperature();
+	size_t coldest = telluric->getColdestTemperature();
+	if(hottest > 175 && hottest < 371 && coldest > 175 && coldest < 371){
+		// Temperature is always fine: planet is habitable
+		std::cout << "\e[32m";
+	}else if(hottest >= 371 && coldest <= 175){
+		// Temperature is too extreme
+		std::cout << "\e[35m";
+	}else if(hottest >= 371 && coldest >= 371){
+		// Temperature is always too hot
+		std::cout << "\e[31m";
+	}else if(hottest >= 371 && coldest <= 371){
+		// Temperature is too hot in the hottest case
+		std::cout << "\e[91m";
+	}else if(coldest <= 175 && hottest <= 175){
+		// Temperature is always too cold
+		std::cout << "\e[34m";
+	}else if(coldest <= 175 && hottest >= 175){
+		// Temperature is too cold in the coldest case
+		std::cout << "\e[36m";
+	}
+	std::cout << std::string(depth,'\t') << planet->getName()
+		<< " (Telluric) [" << coldest << ';' << hottest << "]\e[0m"
+		<< std::endl;
+}
+
+std::string spaceToHtml(TelluricPlanet* t){
+	std::string res;
+	size_t hottest = t->getHottestTemperature();
+	size_t coldest = t->getColdestTemperature();
+	if(hottest > 175 && hottest < 371 && coldest > 175 && coldest < 371){
+		// Temperature is always fine: planet is habitable
+		res += "<span style='color:green'>";
+	}else if(hottest >= 371 && coldest <= 175){
+		// Temperature is too extreme
+		res += "<span style='color:darkmagenta'>";
+	}else if(hottest >= 371 && coldest >= 371){
+		// Temperature is always too hot
+		res += "<span style='color:red'>";
+	}else if(hottest >= 371 && coldest <= 371){
+		// Temperature is too hot in the hottest case
+		res += "<span style='color:rgb(200,0,0)'>";
+	}else if(coldest <= 175 && hottest <= 175){
+		// Temperature is always too cold
+		res += "<span style='color:blue'>";
+	}else if(coldest <= 175 && hottest >= 175){
+		// Temperature is too cold in the coldest case
+		res += "<span style='color:cyan'>";
+	}
+	res += t->getName()+" (Telluric) ["+coldest+';'+hottest+"]</span>";
+	return res;
+}
+
+std::string spaceToHtml(World* w){
+	if(w->isGasPlanet()){
+		return spaceToHtml((GasPlanet*)w);
+	}else{
+		return spaceToHtml((TelluricPlanet*)w);
+	}
+}
+
+std::string spaceToHtml(StarSystem* s){
+	std::vector<Star*> stars = s->getStars();
+	std::vector<World*> worlds = s->getWorlds();
+	std::vector<std::vector<std::pair<size_t,World*>>> planets(stars.size());
+	std::vector<std::vector<std::pair<size_t,World*>>> satellites(worlds.size());
+	std::vector<std::pair<size_t,World*>> circumbinaries;
+	for(size_t i = 0;i < worlds.size();i++){
+		AstralObject* orbiting = worlds[i]->getOrbiting();
+		if(orbiting == nullptr){
+			circumbinaries.push_back({i,worlds[i]});
+		}else if(orbiting->isStar()){
+			for(size_t j = 0;j < stars.size();j++){
+				if(orbiting == stars[j]){
+					planets[j].push_back({i,worlds[i]});
+				}
+			}
+		}else{
+			for(size_t j = 0;j < worlds.size();j++){
+				if(orbiting == worlds[j]){
+					satellites[j].push_back({i,worlds[i]});
+				}
+			}
+		}
+	}
+	auto cmp = [](std::pair<size_t,World*>& a,std::pair<size_t,World*>& b){
+		return a.second->getDistance() < b.second->getDistance();
+	};
+	for(size_t i = 0;i < planets.size();i++){
+		std::sort(planets[i].begin(),planets[i].end(),cmp);
+	}
+	for(size_t i = 0;i < satellites.size();i++){
+		std::sort(satellites[i].begin(),satellites[i].end(),cmp);
+	}
+	std::sort(circumbinaries.begin(),circumbinaries.end(),cmp);
+
+	std::string res = std::string("<h1>")+s->getName()+"</h1>"+s->getName()+" is a stellar system with "+stars.size()+" stars:<ul>";
+	for(size_t i = 0;i < stars.size();i++){
+		res += "<li>"+s->getName()+" "+((char)('A'+i))+" is a class "+stars[i]->getStarClass()[0]+stars[i]->getStarClass()[1]+" star ("+stars[i]->getTemperature()+"K)<ul>";
+		for(size_t j = 0;j < planets[i].size();j++){
+			World* planet = planets[i][j].second;
+			size_t planetIndex = planets[i][j].first;
+			res += "<li>"+spaceToHtml(planet)+"<ul>";
+			for(size_t k = 0;k < satellites[planetIndex].size();k++){
+				World* satellite = satellites[planetIndex][k].second;
+				res += "<li>"+spaceToHtml(satellite)+"</li>";
+			}
+			res += "</ul></li>";
+		}
+		res += "</ul></li>";
+	}
+	res += "</ul><br>";
+	if(stars.size() > 1){
+		res += "Circumbinaries:";
+	}
+	res += "<ul>";
+	for(size_t i = 0;i < circumbinaries.size();i++){
+		World* planet = circumbinaries[i].second;
+		size_t planetIndex = circumbinaries[i].first;
+		res += "<li>"+spaceToHtml(planet)+"<ul>";
+		for(size_t j = 0;j < satellites[planetIndex].size();j++){
+			World* satellite = satellites[planetIndex][j].second;
+			res += "<li>"+spaceToHtml(satellite)+"</li>";
+		}
+		res += "</ul></li>";
+	}
+	res += "</ul>";
+	return res;
+}
+
+void update(){
 	emscripten::val document = emscripten::val::global("document");
-	
-	emscripten::val politique = document.call<emscripten::val>("querySelector","#politique"_val);
-	politique.set("innerHTML",entiteToHtml(monde));
+
+	emscripten::val politics = document.call<emscripten::val>("querySelector","#politics"_val);
+	politics.set("innerHTML",entiteToHtml(monde));
+
+	emscripten::val spaceDiv = document.call<emscripten::val>("querySelector","#space"_val);
+	spaceDiv.set("innerHTML",spaceToHtml(space));
 }
 
 void log(std::string s,bool asHTML = false){
@@ -148,120 +291,104 @@ void log(std::string s,bool asHTML = false){
 	document.call<emscripten::val>("querySelector","#log"_val).call<void>("append",li);
 }
 
-void genererMonde(){
-	if(monde != NULL){
+void generateWorld(){
+	if(monde != nullptr){
 		delete monde;
 	}
-	monde = new Monde();
+	if(space != nullptr){
+		delete space;
+	}
+	space = new StarSystem();
+	std::vector<World*> habitables = space->getHabitableWorlds();
+	while(habitables.size() == 0){
+		delete space;
+		space = new StarSystem();
+		habitables = space->getHabitableWorlds();
+	}
+	monde = new Monde(habitables[0]->getName());
 	emscripten::val::global("document").call<emscripten::val>("querySelector","#log"_val).set("innerHTML","");
-	log("1/1/1: Le monde est créé.");
-	miseAJour();
+	log("1/1/1: The world is created.");
+	update();
 }
 
-EM_BOOL genererMonde_click(int /*eventType*/,const EmscriptenMouseEvent* /*e*/,void* /*userData*/){
-	genererMonde();
+EM_BOOL generateWorld_click(int /*eventType*/,const EmscriptenMouseEvent* /*e*/,void* /*userData*/){
+	generateWorld();
 	return 0;
+}
+
+emscripten::val createTab(std::string id,std::string textContent){
+	emscripten::val document = emscripten::val::global("document");
+	emscripten::val res = document.call<emscripten::val>("createElement","span"_val);
+	res.set("id",id);
+	res.set("textContent",textContent);
+	res["style"].set("border","solid 1px black");
+	return res;
+}
+
+emscripten::val createDiv(std::string id){
+	emscripten::val document = emscripten::val::global("document");
+	emscripten::val res = document.call<emscripten::val>("createElement","div"_val);
+	res.set("id",id);
+	res["style"].set("display","none");
+	return res;
 }
 
 int main(){
 	emscripten::val document = emscripten::val::global("document");
 	
-	document.set("title",std::string("Générateur"));
+	document.set("title",std::string("Generateur"));
 	
-	emscripten::val afficher = document.call<emscripten::val>("createElement","div"_val);
-	afficher.set("id","afficher");
+	emscripten::val display = document.call<emscripten::val>("createElement","div"_val);
+	display.set("id","display");
 	
-	emscripten::val onglets = document.call<emscripten::val>("createElement","span"_val);
-	onglets["style"].set("position","fixed");
-	onglets["style"].set("backgroundColor","white");
-	onglets["style"].set("cursor","pointer");
-	onglets["style"].set("top",0);
-	onglets["style"].set("userSelect","none");
-	afficher.call<void>("append",onglets);
+	emscripten::val tabs = document.call<emscripten::val>("createElement","span"_val);
+	tabs["style"].set("position","fixed");
+	tabs["style"].set("backgroundColor","white");
+	tabs["style"].set("cursor","pointer");
+	tabs["style"].set("top",0);
+	tabs["style"].set("userSelect","none");
+	display.call<void>("append",tabs);
+	emscripten::val historyTab = createTab("history_tab","History");
+	historyTab["style"].set("backgroundColor","yellow");
+	tabs.call<void>("append",historyTab);
 	
-	emscripten::val ongletHistorique = document.call<emscripten::val>("createElement","span"_val);
-	ongletHistorique.set("id","onglet_historique");
-	ongletHistorique.set("textContent","Historique");
-	ongletHistorique["style"].set("border","solid 1px black");
-	ongletHistorique["style"].set("backgroundColor","yellow");
-	onglets.call<void>("append",ongletHistorique);
+	tabs.call<void>("append",createTab("politics_tab","Politics"));
+	tabs.call<void>("append",createTab("ecology_tab","Ecology"));
+	tabs.call<void>("append",createTab("calendar_tab","Calendar"));
+	tabs.call<void>("append",createTab("space_tab","Space"));
+	tabs.call<void>("append",createTab("skipTime","Skip 10 years"));
+	tabs.call<void>("append",createTab("generateWorld","Generate a new world"));
 	
-	emscripten::val ongletPolitique = document.call<emscripten::val>("createElement","span"_val);
-	ongletPolitique.set("id","onglet_politique");
-	ongletPolitique.set("textContent","Politique");
-	ongletPolitique["style"].set("border","solid 1px black");
-	onglets.call<void>("append",ongletPolitique);
-	
-	emscripten::val ongletEcologie = document.call<emscripten::val>("createElement","span"_val);
-	ongletEcologie.set("id","onglet_ecologie");
-	ongletEcologie.set("textContent","Ecologie");
-	ongletEcologie["style"].set("border","solid 1px black");
-	onglets.call<void>("append",ongletEcologie);
-	
-	emscripten::val ongletCalendrier = document.call<emscripten::val>("createElement","span"_val);
-	ongletCalendrier.set("id","onglet_calendrier");
-	ongletCalendrier.set("textContent","Calendrier");
-	ongletCalendrier["style"].set("border","solid 1px black");
-	onglets.call<void>("append",ongletCalendrier);
-	
-	emscripten::val ongletPasserTemps = document.call<emscripten::val>("createElement","span"_val);
-	ongletPasserTemps.set("id","passerTemps");
-	ongletPasserTemps.set("textContent","Passer 10 ans");
-	ongletPasserTemps["style"].set("border","solid 1px black");
-	onglets.call<void>("append",ongletPasserTemps);
-	
-	emscripten::val ongletGenererMonde = document.call<emscripten::val>("createElement","span"_val);
-	ongletGenererMonde.set("id","genererMonde");
-	ongletGenererMonde.set("textContent","Generer un nouveau monde");
-	ongletGenererMonde["style"].set("border","solid 1px black");
-	onglets.call<void>("append",ongletGenererMonde);
-	
-	emscripten::val historique = document.call<emscripten::val>("createElement","div"_val);
-	historique.set("id","historique");
-	historique["style"].set("display","block");
-	historique["style"].set("marginTop","20px");
+	emscripten::val history = document.call<emscripten::val>("createElement","div"_val);
+	history.set("id","history");
+	history["style"].set("display","block");
+	history["style"].set("marginTop","20px");
 	emscripten::val ulLog = document.call<emscripten::val>("createElement","ul"_val);
 	ulLog.set("id","log");
-	historique.call<void>("append",ulLog);
-	afficher.call<void>("append",historique);
+	history.call<void>("append",ulLog);
+	display.call<void>("append",history);
 	
-	emscripten::val politique = document.call<emscripten::val>("createElement","div"_val);
-	politique.set("id","politique");
-	politique["style"].set("display","none");
-	afficher.call<void>("append",politique);
-	
-	emscripten::val ecologie = document.call<emscripten::val>("createElement","div"_val);
-	ecologie.set("id","ecologie");
-	ecologie["style"].set("display","none");
-	afficher.call<void>("append",ecologie);
-	
-	emscripten::val calendrier = document.call<emscripten::val>("createElement","div"_val);
-	calendrier.set("id","calendrier");
-	calendrier["style"].set("display","none");
-	afficher.call<void>("append",calendrier);
+	display.call<void>("append",createDiv("politics"));
+	display.call<void>("append",createDiv("ecology"));
+	display.call<void>("append",createDiv("calendar"));
+	display.call<void>("append",createDiv("space"));
 	
 	document["body"].set("innerText","");
-	document["body"].call<void>("append",afficher);
+	document["body"].call<void>("append",display);
 	
-	/*std::cout << */emscripten_set_mousedown_callback("#onglet_historique",hist,false,onglet_click)/* << std::endl*/;
-	/*std::cout << */emscripten_set_mousedown_callback("#onglet_politique",pol,false,onglet_click)/* << std::endl*/;
-	/*std::cout << */emscripten_set_mousedown_callback("#onglet_ecologie",eco,false,onglet_click)/* << std::endl*/;
-	/*std::cout << */emscripten_set_mousedown_callback("#onglet_calendrier",cal,false,onglet_click)/* << std::endl*/;
-	emscripten_set_mousedown_callback("#genererMonde",NULL,false,genererMonde_click);
+	emscripten_set_mousedown_callback("#history_tab",hist,false,onglet_click);
+	emscripten_set_mousedown_callback("#politics_tab",pol,false,onglet_click);
+	emscripten_set_mousedown_callback("#ecology_tab",eco,false,onglet_click);
+	emscripten_set_mousedown_callback("#calendar_tab",cal,false,onglet_click);
+	emscripten_set_mousedown_callback("#space_tab",spa,false,onglet_click);
+	emscripten_set_mousedown_callback("#generateWorld",NULL,false,generateWorld_click);
 	
 	//EM_ASM(Module['noExitRuntime'] = true);
 	//emscripten::val::global("Module").set("noExitRuntime",true);
 	emscripten_set_main_loop(mainLoop,-1,0);
 	
 	srand(time(NULL));
-	genererMonde();
-	
-	/*emscripten::val div = document.call<emscripten::val>("createElement",emscripten::val("div"));
-	div["style"].set("position","absolute");
-	div["style"].set("top",0);
-	div["style"].set("left",0);
-	div.set("textContent","COUCOU");
-	document["body"].call<void>("append",div);*/
+	generateWorld();
 }
 
 #else // if WEB == 0
