@@ -9,7 +9,13 @@ std::string consDoublables = "bcdfgkpqtvwBCDFGKPQTVW";
 std::string consDoublantes = "lrLR";
 
 int randomInt(int min,int max){
-	return ((rand()%(max-min))+min);
+	int res;
+	if(min == max){
+		res = min;
+	}else{
+		res = ((rand()%(max-min))+min);
+	}
+	return res;
 }
 
 int randomInt(int max){
