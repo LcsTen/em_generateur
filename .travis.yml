@@ -12,10 +12,10 @@ before_install:
   - python3 --version
 
 script:
-    - make WEB=1 main.html # Compile files
+    - make WEB=1 # Compile files
     - rm -rf obj # Clean intermediate compilation files
     - mkdir -p gh-pages # Create gh-pages directory (local-dir)
-    - mv main.{html,js,wasm} gh-pages # Move the resulting files to that directory
+    - mv index.{html,js,wasm} gh-pages # Move the resulting files to that directory
 
 deploy:
   provider: pages
