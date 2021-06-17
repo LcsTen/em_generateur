@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang=en-us>
+<head>
+	<meta charset=utf-8>
+	<meta content="text/html; charset=utf-8" http-equiv=Content-Type>
+	<title>Generateur</title>
+	<link rel="shortcut icon" href="img/favicon.gif">
+	<style>
+		body{
+			font-family:arial;
+			margin:0;
+		}
+
+		.spinner{
+			height:30px;
+			width:30px;
+			margin:0;
+			margin-top:20px;
+			margin-left:20px;
+			display:inline-block;
+			vertical-align:top;
+			animation:rotation .8s linear infinite;
+			border-left:5px solid #ebebeb;
+			border-right:5px solid #ebebeb;
+			border-bottom:5px solid #ebebeb;
+			border-top:5px solid #787878;
+			border-radius:100%;
+			background-color:#bdd72e
+		}
+
+		@keyframes rotation{
+			from{
+				transform:rotate(0)
+			}
+
+			to{
+				transform:rotate(360deg)
+			}
+		}
+
+		#status{
+			display:inline-block;
+			vertical-align:top;
+			margin-top:30px;
+			margin-left:20px;
+			font-weight:700;
+			color:#787878
+		}
+
+		#progress{
+			height:20px;
+			width:300px
+		}
+	</style>
+</head>
+<body>
+	<div id=splash>
+		<div id=spinner class=spinner></div>
+		<div id=status><noscript>This webpage needs JavaScript to work.</noscript></div>
+		<div><progress id=progress max=100 value=0></progress></div>
+	</div>
+	<div id=display style="display: none">
+		<span style="position: fixed; background-color: white; cursor: pointer; top: 0; user-select: none"><span id=history_tab style="border: solid 1px black; background-color: yellow">History</span><span id=politics_tab style="border: solid 1px black">Politics</span><span id=ecology_tab style="border: solid 1px black">Ecology</span><span id=calendar_tab style="border: solid 1px black">Calendar</span><span id=space_tab style="border: solid 1px black">Space</span><span id=skip_turn style="border: solid 1px black">Skip 10 years</span><span id=generate_world style="border: solid 1px black">Generate a new world</span></span>
+		<div id=history style="margin-top: 20px;display: block"><ul id=log></ul></div>
+		<div id=politics style="display: none"></div>
+		<div id=ecology style="display: none"></div>
+		<div id=calendar style="display: none"></div>
+		<div id=space style="display: none"></div>
+	</div>
+	<script>
+		let categories = ["history", "politics", "ecology", "calendar", "space"];
+
+		function hideAll(){
+			categories.forEach(category => {
+				document.getElementById(category+"_tab").style.backgroundColor = "white";
+				document.getElementById(category).style.display = "none";
+			});
+		}
+
+		categories.forEach(category => {
+			let tab = document.getElementById(category+"_tab");
+			tab.addEventListener("click", () => {
+				hideAll();
+				document.getElementById(category).style.display = "block";
+				tab.style.backgroundColor = "yellow";
+			});
+		});
+	</script>
+	<script>
+		var statusElement = document.getElementById("status"),
+		progressElement = document.getElementById("progress"),
+		spinnerElement = document.getElementById("spinner"),
+		Module = {
+			preRun: [],
+
+			postRun: [],
+
+			print: function(){
+				var e = document.getElementById("output");
+				return e && (e.value=""),
+					function(t){
+						arguments.length>1 && (t=Array.prototype.slice.call(arguments).join(" ")),
+						console.log(t),
+						e && (e.value+=t+"\n",e.scrollTop=e.scrollHeight)
+					}
+			}(),
+
+			printErr: function(e){
+				arguments.length>1&&(e=Array.prototype.slice.call(arguments).join(" ")),
+				console.error(e)
+			},
+
+			canvas: null,
+
+			setStatus: function(e){
+				if(Module.setStatus.last || (Module.setStatus.last={time:Date.now(),text:""}),
+				e!==Module.setStatus.last.text){
+					var t=e.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/),
+					n=Date.now();
+					t && n-Module.setStatus.last.time<30 || (Module.setStatus.last.time=n,Module.setStatus.last.text=e,
+					t ? (e=t[1],
+					progressElement.value=100*parseInt(t[2]),
+					progressElement.max=100*parseInt(t[4]),
+					progressElement.hidden=!1,
+					spinnerElement.hidden=!1)
+					: (progressElement.value=null,
+					progressElement.max=null,
+					progressElement.hidden=!0,
+					e || (spinnerElement.style.display="none")
+					),
+					statusElement.innerHTML=e)
+				}
+			},
+
+			totalDependencies: 0,
+
+			monitorRunDependencies: function(e){
+				this.totalDependencies=Math.max(this.totalDependencies,e),
+				Module.setStatus(e ? "Preparing... ("+(this.totalDependencies-e)+"/"+this.totalDependencies+")"
+				: "All downloads complete.")
+			}
+		};
+
+		Module.setStatus("Downloading..."),
+		window.onerror = function(e){
+			Module.setStatus("Exception thrown, see JavaScript console"),
+			spinnerElement.style.display="none",
+			Module.setStatus = function(e){
+				e && Module.printErr("[post-exception status] "+e)
+			}
+		}
+	</script>
+	<script async src=index.js></script>
+</body>
+</html>

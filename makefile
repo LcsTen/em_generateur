@@ -40,7 +40,7 @@ endif
 ifneq ($(WEB),0)
 	obj_dir = obj/web
 	CXX = em++
-	TARGET = index.html
+	TARGET = index.js
 	override LDFLAGS += --emrun --bind
 else
 	CXX ?= g++
@@ -92,7 +92,7 @@ run: $(TARGET)
 ifeq ($(WEB),0)
 	- ./$^
 else
-	- emrun $(TARGET)
+	- emrun $(TARGET:%.js=%.html)
 endif
 
 clean:

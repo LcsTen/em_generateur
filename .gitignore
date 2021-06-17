@@ -3,7 +3,6 @@ generateur-*
 obj/
 *.o
 *.stackdump
-*.html
 *.js
 *.wasm
 *.exe

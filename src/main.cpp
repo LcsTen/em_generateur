@@ -27,35 +27,7 @@ emscripten::val operator""_val(const char* s,size_t){
 	return emscripten::val(s);
 }
 
-void hideAll(){
-	emscripten::val document = emscripten::val::global("document");
-	document.call<emscripten::val>("querySelector","#history"_val)["style"].set("display","none");
-	document.call<emscripten::val>("querySelector","#politics"_val)["style"].set("display","none");
-	document.call<emscripten::val>("querySelector","#ecology"_val)["style"].set("display","none");
-	document.call<emscripten::val>("querySelector","#calendar"_val)["style"].set("display","none");
-	document.call<emscripten::val>("querySelector","#space"_val)["style"].set("display","none");
-	document.call<emscripten::val>("querySelector","#history_tab"_val)["style"].set("backgroundColor","white");
-	document.call<emscripten::val>("querySelector","#politics_tab"_val)["style"].set("backgroundColor","white");
-	document.call<emscripten::val>("querySelector","#ecology_tab"_val)["style"].set("backgroundColor","white");
-	document.call<emscripten::val>("querySelector","#calendar_tab"_val)["style"].set("backgroundColor","white");
-	document.call<emscripten::val>("querySelector","#space_tab"_val)["style"].set("backgroundColor","white");
-}
-
-EM_BOOL onglet_click(int /*eventType*/,const EmscriptenMouseEvent* /*e*/,void* userData){
-	hideAll();
-	emscripten::val document = emscripten::val::global("document");
-	document.call<emscripten::val>("querySelector",emscripten::val(std::string("#")+(char*)userData))["style"].set("display","block");
-	document.call<emscripten::val>("querySelector",emscripten::val(std::string("#")+(char*)userData+"_tab"))["style"].set("backgroundColor","yellow");
-	return 0;
-}
-
 void mainLoop(){}
-
-char hist[] = "history";
-char pol[] = "politics";
-char eco[] = "ecology";
-char cal[] = "calendar";
-char spa[] = "space";
 
 void update(){
 	emscripten::val document = emscripten::val::global("document");
@@ -76,77 +48,13 @@ void log(std::string s){
 	document.call<emscripten::val>("querySelector","#log"_val).call<void>("append",li);
 }
 
-EM_BOOL generateWorld_click(int /*eventType*/,const EmscriptenMouseEvent* /*e*/,void* /*userData*/){
+EM_BOOL generate_world_click(int /*eventType*/,const EmscriptenMouseEvent* /*e*/,void* /*userData*/){
 	backend.generateWorld();
 	return 0;
 }
 
-emscripten::val createTab(std::string id,std::string textContent){
-	emscripten::val document = emscripten::val::global("document");
-	emscripten::val res = document.call<emscripten::val>("createElement","span"_val);
-	res.set("id",id);
-	res.set("textContent",textContent);
-	res["style"].set("border","solid 1px black");
-	return res;
-}
-
-emscripten::val createDiv(std::string id){
-	emscripten::val document = emscripten::val::global("document");
-	emscripten::val res = document.call<emscripten::val>("createElement","div"_val);
-	res.set("id",id);
-	res["style"].set("display","none");
-	return res;
-}
-
 int main(){
-	emscripten::val document = emscripten::val::global("document");
-	
-	document.set("title",std::string("Generateur"));
-	
-	emscripten::val display = document.call<emscripten::val>("createElement","div"_val);
-	display.set("id","display");
-	
-	emscripten::val tabs = document.call<emscripten::val>("createElement","span"_val);
-	tabs["style"].set("position","fixed");
-	tabs["style"].set("backgroundColor","white");
-	tabs["style"].set("cursor","pointer");
-	tabs["style"].set("top",0);
-	tabs["style"].set("userSelect","none");
-	display.call<void>("append",tabs);
-	emscripten::val historyTab = createTab("history_tab","History");
-	historyTab["style"].set("backgroundColor","yellow");
-	tabs.call<void>("append",historyTab);
-	
-	tabs.call<void>("append",createTab("politics_tab","Politics"));
-	tabs.call<void>("append",createTab("ecology_tab","Ecology"));
-	tabs.call<void>("append",createTab("calendar_tab","Calendar"));
-	tabs.call<void>("append",createTab("space_tab","Space"));
-	tabs.call<void>("append",createTab("skipTime","Skip 10 years"));
-	tabs.call<void>("append",createTab("generateWorld","Generate a new world"));
-	
-	emscripten::val history = document.call<emscripten::val>("createElement","div"_val);
-	history.set("id","history");
-	history["style"].set("display","block");
-	history["style"].set("marginTop","20px");
-	emscripten::val ulLog = document.call<emscripten::val>("createElement","ul"_val);
-	ulLog.set("id","log");
-	history.call<void>("append",ulLog);
-	display.call<void>("append",history);
-	
-	display.call<void>("append",createDiv("politics"));
-	display.call<void>("append",createDiv("ecology"));
-	display.call<void>("append",createDiv("calendar"));
-	display.call<void>("append",createDiv("space"));
-	
-	document["body"].set("innerText","");
-	document["body"].call<void>("append",display);
-	
-	emscripten_set_mousedown_callback("#history_tab",hist,false,onglet_click);
-	emscripten_set_mousedown_callback("#politics_tab",pol,false,onglet_click);
-	emscripten_set_mousedown_callback("#ecology_tab",eco,false,onglet_click);
-	emscripten_set_mousedown_callback("#calendar_tab",cal,false,onglet_click);
-	emscripten_set_mousedown_callback("#space_tab",spa,false,onglet_click);
-	emscripten_set_mousedown_callback("#generateWorld",NULL,false,generateWorld_click);
+	emscripten_set_mousedown_callback("#generate_world",NULL,false,generate_world_click);
 
 	emscripten_set_main_loop(mainLoop,-1,0);
 	
@@ -154,6 +62,10 @@ int main(){
 	backend.onWorldChanged(update);
 	backend.onLogPrinted(log);
 	backend.generateWorld();
+
+	emscripten::val document = emscripten::val::global("document");
+	document.call<emscripten::val>("querySelector","#splash"_val)["style"].set("display", "none");
+	document.call<emscripten::val>("querySelector","#display"_val)["style"].set("display", "block");
 }
 
 #endif // WEB != 1
