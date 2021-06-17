@@ -1,4 +1,5 @@
 main
+generateur-*
 obj/
 *.o
 *.stackdump
@@ -7,3 +8,4 @@ obj/
 *.wasm
 *.exe
 *.d
+*.moc

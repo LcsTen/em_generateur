@@ -1,6 +1,7 @@
 #include "general.h"
 
 #include <random>
+#include <cstring>
 
 std::string voyPond = "aaaaaaaeeeeeeeeeeeeeeiiiiiiiooooouuuuuyAAAAAAAEEEEEEEEEEEEEEIIIIIIIOOOOOUUUUUY";
 std::string consPond = "bcccddddfghjklllllmmmnnnnnnpprrrrrrsssssssttttttvwxzBCCCDDDDFGHJKLLLLLMMMNNNNNNPPRRRRRRSSSSSSSTTTTTTVWXZ";
@@ -279,3 +280,27 @@ std::string generateName(int longMax){
 	}
 	return res;
 }
+
+std::string format(int a){
+	char buf[1024];
+	sprintf(buf,"%d",a);
+	std::string res = "";
+	int length = strlen(buf);
+	for(int i = 0;i < length;i++){
+		if(i % 3 == 0 && i != 0){
+			res = ' '+res;
+		}
+		res = buf[length-i-1]+res;
+	}
+	return res;
+}
+
+std::string operator+(std::string a,int b){
+	return a+format(b);
+}
+
+#if QT != 0
+QString operator+(QString a, std::string b){
+	return a+QString::fromStdString(b);
+}
+#endif

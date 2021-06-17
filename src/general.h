@@ -15,6 +15,15 @@ void genererGentile(std::string nom,std::string* ms,std::string* mp,std::string*
 
 std::string generateName(int longMax);
 
+std::string format(int a);
+
+std::string operator+(std::string a,int b);
+
+#if QT != 0
+#include <QString>
+QString operator+(QString a, std::string b);
+#endif
+
 template<typename T>
 typename std::vector<T>::const_iterator find(const std::vector<T>& vector,const T& needle){
 	return std::find(vector.begin(),vector.end(),needle);

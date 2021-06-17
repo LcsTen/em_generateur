@@ -11,7 +11,7 @@ class Groupe : public Entite{
 		int population = 0;
 		
 	public:
-		Groupe(std::string nom,Ville& ville);
+		Groupe(std::string nom,Ville* ville);
 		
 		Entite* creerEnfant(std::string nom) override;
 		Entite* creerEnfant() override;

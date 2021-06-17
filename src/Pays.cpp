@@ -3,7 +3,7 @@
 #include "Ville.h"
 #include "general.h"
 
-Pays::Pays(std::string nom,Monde& monde) : Entite(nom,monde) {
+Pays::Pays(std::string nom,Monde* monde) : Entite(nom,monde) {
 	int nbVilles = randomInt(2,10);
 	for(int i = 0;i < nbVilles;i++){
 		creerEnfant();
@@ -11,7 +11,7 @@ Pays::Pays(std::string nom,Monde& monde) : Entite(nom,monde) {
 }
 
 Entite* Pays::creerEnfant(std::string nom){
-	Ville* v = new Ville(nom,*this);
+	Ville* v = new Ville(nom,this);
 	enfants.push_back(v);
 	return v;
 }

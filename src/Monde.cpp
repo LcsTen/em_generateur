@@ -3,7 +3,7 @@
 #include "Pays.h"
 #include "general.h"
 
-Monde::Monde(std::string nom,size_t lin,size_t col) : Entite(nom,*this), map(lin,col){
+Monde::Monde(std::string nom,size_t lin,size_t col) : Entite(nom,this), map(lin,col){
 	int nbPays = randomInt(2,10);
 	for(int i = 0;i < nbPays;i++){
 		creerEnfant();
@@ -17,7 +17,7 @@ Monde::Monde(size_t lin,size_t col) : Monde(generateName(10),lin,col) {}
 Monde::Monde() : Monde(generateName(10)) {}
 
 Entite* Monde::creerEnfant(std::string nom){
-	Pays* p = new Pays(nom,*this);
+	Pays* p = new Pays(nom,this);
 	enfants.push_back(p);
 	return p;
 }

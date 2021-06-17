@@ -2,7 +2,7 @@
 
 #include "general.h"
 
-Groupe::Groupe(std::string nom,Ville& ville) : Entite(nom,ville) {
+Groupe::Groupe(std::string nom,Ville* ville) : Entite(nom,ville) {
 	population = randomInt(1000,10000);
 }
 	

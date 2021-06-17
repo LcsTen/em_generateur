@@ -3,7 +3,7 @@
 #include "Groupe.h"
 #include "general.h"
 
-Ville::Ville(std::string nom,Pays& pays) : Entite(nom,pays) {
+Ville::Ville(std::string nom,Pays* pays) : Entite(nom,pays) {
 	int nbGroupes = randomInt(2,10);
 	for(int i = 0;i < nbGroupes;i++){
 		creerEnfant();
@@ -11,7 +11,7 @@ Ville::Ville(std::string nom,Pays& pays) : Entite(nom,pays) {
 }
 		
 Entite* Ville::creerEnfant(std::string nom){
-	Groupe* g = new Groupe(nom,*this);
+	Groupe* g = new Groupe(nom,this);
 	enfants.push_back(g);
 	return g;
 }

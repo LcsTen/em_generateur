@@ -9,7 +9,7 @@
 class Ville : public Entite {
 		
 	public:
-		Ville(std::string nom,Pays& pays);
+		Ville(std::string nom,Pays* pays);
 		
 		Entite* creerEnfant(std::string nom) override;
 		Entite* creerEnfant() override;
