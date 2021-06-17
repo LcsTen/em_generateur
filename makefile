@@ -45,7 +45,7 @@ ifneq ($(WEB),0)
 else
 	CXX ?= g++
 	ifneq ($(DEBUG),0)
-		override CXXFLAGS += -g -Og
+		override CXXFLAGS += -g
 	endif
 	ifneq ($(CONSOLE),0)
 		obj_dir = obj/console
@@ -80,7 +80,7 @@ all: $(TARGET)
 $(TARGET): $(objs)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
 ifeq ($(WEB),0)
-    ifeq ($(DEBUG),1)
+    ifeq ($(DEBUG),0)
 	strip $@
     endif
 endif
