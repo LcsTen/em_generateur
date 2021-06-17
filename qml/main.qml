@@ -67,14 +67,14 @@ ApplicationWindow {
 						label.text = ""
 					}else if(index === 1){
 						// Politics
-						label.text = Backend.politicsToHtml();
+						label.text = Backend.politicsToString();
 					}else if(index === 2){
 						label.text = "Ecology"
 					}else if(index === 3){
 						label.text = "Calendar"
 					}else if(index === 4){
 						// Space
-						label.text = Backend.spaceToHtml();
+						label.text = Backend.spaceToString();
 					}
 				}
 

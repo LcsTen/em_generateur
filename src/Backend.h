@@ -35,8 +35,9 @@ class Backend
 	public:
 		Backend();
 
-		Q_INVOKABLE STRING_TYPE politicsToHtml();
-		Q_INVOKABLE STRING_TYPE spaceToHtml();
+		Q_INVOKABLE STRING_TYPE politicsToString();
+		Q_INVOKABLE STRING_TYPE spaceToString();
+		std::string mapToString();
 		Q_INVOKABLE void generateWorld();
 		void onWorldChanged(std::function<void()> f);
 		void onLogPrinted(std::function<void(std::string)> f);
@@ -46,13 +47,13 @@ class Backend
 		void logPrinted(STRING_TYPE s);
 
 	private:
-		std::string entiteToHtml(Ville* ville);
-		std::string entiteToHtml(Pays* pays);
-		std::string entiteToHtml(Monde* m);
-		std::string spaceToHtml(GasPlanet* g);
-		std::string spaceToHtml(TelluricPlanet* t);
-		std::string spaceToHtml(World* w);
-		std::string spaceToHtml(StarSystem* s);
+		std::string entiteToString(Ville* ville, int depth = 0);
+		std::string entiteToString(Pays* pays, int depth = 0);
+		std::string entiteToString(Monde* m, int depth = 0);
+		std::string spaceToString(GasPlanet* g);
+		std::string spaceToString(TelluricPlanet* t);
+		std::string spaceToString(World* w);
+		std::string spaceToString(StarSystem* s);
 
 		Monde* monde = nullptr;
 		StarSystem* space = nullptr;
