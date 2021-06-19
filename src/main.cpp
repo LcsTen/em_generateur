@@ -91,6 +91,18 @@ int main(int argc, char** argv){
 
 #if CONSOLE != 0
 
+std::string politicsToString(std::vector<std::string> args){
+	int index_country = -1;
+	int index_city = -1;
+	if(args.size() >= 2){
+		index_country = atoi(args[1].c_str());
+	}
+	if(args.size() >= 3){
+		index_city = atoi(args[2].c_str());
+	}
+	return backend.politicsToString(index_country, index_city);
+}
+
 int main(){
 	srand(time(NULL));
 	backend.generateWorld();
@@ -115,11 +127,11 @@ int main(){
 		if(argv[0] == "stop"){
 			stop = true;
 		}else if(argv[0] == "politics"){
-			std::cout << backend.politicsToString() << std::endl;
+			std::cout << politicsToString(argv) << std::endl;
 		}else if(argv[0] == "gen"){
 			backend.generateWorld();
 		}else if(argv[0] == "help"){
-			std::cout << "politics" << std::endl << "\tShow information about the world."
+			std::cout << "politics [id_country [id_city]]" << std::endl << "\tShow information about the world/country/city."
 				<< std::endl << std::endl << "gen" << std::endl << "\tGenerate a new world."
 				<< std::endl << std::endl << "map" << std::endl << "\tShow the world map."
 				<< std::endl << std::endl << "space" << std::endl << "\tShow information about space."

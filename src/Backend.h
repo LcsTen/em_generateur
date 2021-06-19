@@ -35,7 +35,7 @@ class Backend
 	public:
 		Backend();
 
-		Q_INVOKABLE STRING_TYPE politicsToString();
+		Q_INVOKABLE STRING_TYPE politicsToString(int index_country = -1, int index_city = -1);
 		Q_INVOKABLE STRING_TYPE spaceToString();
 		std::string mapToString();
 		Q_INVOKABLE void generateWorld();

@@ -44,8 +44,26 @@ Backend::Backend(){
 	generateWorld();
 }
 
-STRING_TYPE Backend::politicsToString(){
-	std::string res = entiteToString(monde);
+STRING_TYPE Backend::politicsToString(int index_country, int index_city){
+	std::string res;
+	if(index_country <= -1){
+		res = entiteToString(monde);
+	}else{
+		if(index_country < monde->getNbEnfants()){
+			Pays* country = (Pays*)monde->getEnfant(index_country);
+			if(index_city <= -1){
+				res = entiteToString(country);
+			}else{
+				if(index_city < country->getNbEnfants()){
+					res = entiteToString((Ville*)country->getEnfant(index_city));
+				}else{
+					res = std::string("Error: monde[")+index_country+"] has no child "+index_city+BR;
+				}
+			}
+		}else{
+			res = std::string("Error: monde has no child ")+index_country+BR;
+		}
+	}
 	#if QT == 0
 		return res;
 	#else
