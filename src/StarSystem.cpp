@@ -84,7 +84,7 @@ StarSystem::StarSystem(std::string n) : name(n){
 						minDistance = dist;
 					}
 				}
-				distance = randomInt(60000000,std::min(200000000lu,minDistance/2));
+				distance = randomInt(60000000,std::min(size_t(200000000),minDistance/2));
 			}else{
 				distance = randomInt(60000000,200000000);
 			}
