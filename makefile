@@ -38,7 +38,7 @@ ifeq ($(WEB),0)
 	endif
 endif
 ifneq ($(WEB),0)
-	obj_dir = obj/web
+	target_type = web
 	CXX = em++
 	TARGET = index.js
 	override LDFLAGS += --emrun --bind
@@ -48,10 +48,10 @@ else
 		override CXXFLAGS += -g
 	endif
 	ifneq ($(CONSOLE),0)
-		obj_dir = obj/console
+		target_type = console
 		TARGET = generateur-console
 	else
-		obj_dir = obj/qt
+		target_type = qt
 		override GENERAL_CFLAGS = $(shell pkgconf --cflags Qt5Quick)
 		override CXXFLAGS += -fPIC
 		override LIBS += $(shell pkgconf --libs Qt5Quick)
@@ -62,6 +62,7 @@ override GENERAL_CFLAGS += -DWEB=$(WEB) -DCONSOLE=$(CONSOLE) -DQT=$(QT)
 override CXXFLAGS += $(GENERAL_CFLAGS)
 MOCFLAGS = $(GENERAL_CFLAGS)
 
+obj_dir = obj/$(CXX)-$(target_type)
 $(shell mkdir -p $(obj_dir))
 
 sources := $(wildcard src/*.cpp)
