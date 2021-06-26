@@ -3,11 +3,6 @@
 #include <random>
 #include <cstring>
 
-std::string voyPond = "aaaaaaaeeeeeeeeeeeeeeiiiiiiiooooouuuuuyAAAAAAAEEEEEEEEEEEEEEIIIIIIIOOOOOUUUUUY";
-std::string consPond = "bcccddddfghjklllllmmmnnnnnnpprrrrrrsssssssttttttvwxzBCCCDDDDFGHJKLLLLLMMMNNNNNNPPRRRRRRSSSSSSSTTTTTTVWXZ";
-std::string consDoublables = "bcdfgkpqtvwBCDFGKPQTVW";
-std::string consDoublantes = "lrLR";
-
 int randomInt(int min,int max){
 	int res;
 	if(min == max){
@@ -252,6 +247,10 @@ void genererGentile(std::string nom,std::string* ms,std::string* mp,std::string*
 }
 	
 std::string generateName(int longMax){
+	static const std::string voyPond = "aaaaaaaeeeeeeeeeeeeeeiiiiiiiooooouuuuuyAAAAAAAEEEEEEEEEEEEEEIIIIIIIOOOOOUUUUUY";
+	static const std::string consPond = "bcccddddfghjklllllmmmnnnnnnpprrrrrrsssssssttttttvwxzBCCCDDDDFGHJKLLLLLMMMNNNNNNPPRRRRRRSSSSSSSTTTTTTVWXZ";
+	static const std::string consDoublables = "bcdfgkpqtvwBCDFGKPQTVW";
+	static const std::string consDoublantes = "lrLR";
 	std::string res = "";
 	int alea = randomInt(2);
 	bool voyelle = (alea == 0);
