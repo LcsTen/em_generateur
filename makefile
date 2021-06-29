@@ -57,6 +57,9 @@ else
 		override LIBS += $(shell pkgconf --libs Qt5Quick)
 		TARGET = generateur-qt
 	endif
+	ifneq ($(findstring -w64-mingw32-,$(CXX)),)
+		TARGET := $(TARGET).exe
+	endif
 endif
 override GENERAL_CFLAGS += -DWEB=$(WEB) -DCONSOLE=$(CONSOLE) -DQT=$(QT)
 override CXXFLAGS += $(GENERAL_CFLAGS)
