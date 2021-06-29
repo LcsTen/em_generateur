@@ -2,9 +2,8 @@
 
 #include "general.h"
 
-World::World(size_t r,AstralObject* o,size_t d) : AstralObject(r), orbiting(o), distance(d){
-	name = generateName(10);
-}
+World::World(size_t r, AstralObject* o, size_t d) : AstralObject(r),
+	name(generateName(3)), orbiting(o), distance(d){}
 
 std::string World::getName() const{
 	return name;

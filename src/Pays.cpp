@@ -17,7 +17,7 @@ Entite* Pays::creerEnfant(std::string nom){
 }
 
 Entite* Pays::creerEnfant(){
-	return creerEnfant(generateName(10));
+	return creerEnfant(generateName(3));
 }
 
 int Pays::getPopulation() const{

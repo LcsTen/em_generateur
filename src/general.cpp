@@ -22,7 +22,7 @@ double randouble(){
 }
 
 bool endsWith(std::string a,std::string b){
-	return (a.substr(a.size()-b.size(),b.size()) == b);
+	return (a.size() >= b.size() && a.substr(a.size()-b.size(),b.size()) == b);
 }
 
 bool endsWith(std::string a,char b){
@@ -246,43 +246,28 @@ void genererGentile(std::string nom,std::string* ms,std::string* mp,std::string*
 	}
 }
 	
-std::string generateName(int longMax){
-	static const std::string voyPond = "aaaaaaaeeeeeeeeeeeeeeiiiiiiiooooouuuuuyAAAAAAAEEEEEEEEEEEEEEIIIIIIIOOOOOUUUUUY";
-	static const std::string consPond = "bcccddddfghjklllllmmmnnnnnnpprrrrrrsssssssttttttvwxzBCCCDDDDFGHJKLLLLLMMMNNNNNNPPRRRRRRSSSSSSSTTTTTTVWXZ";
-	static const std::string consDoublables = "bcdfgkpqtvwBCDFGKPQTVW";
-	static const std::string consDoublantes = "lrLR";
+std::string generateName(int syllablesMax){
+	static const std::string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	static const std::string consonants = "bcdfghjklmnpqrstvwxz";
+	static const std::vector<std::string> allVowels = {"a", "e", "i", "o",
+		"u", "y", "ai", "au", "ei", "eu", "oi", "ou"};
+	static const std::vector<std::string> allConsonants = {"b", "c", "d",
+		"f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t",
+		"v", "w", "x", "z", "bl", "br", "ch", "cl", "cr", "dr", "fl",
+		"fr", "gl", "gn", "gr", "kl", "kr", "ph", "pl", "pr", "qr",
+		"ql", "tr", "vl", "vr", "wl", "wr"};
 	std::string res = "";
-	int alea = randomInt(2);
-	bool voyelle = (alea == 0);
-	int longueur = randomInt(3,longMax+1);
-	for(int i = 0;i < longueur;i++){
-		if(voyelle){
-			alea = randomInt(voyPond.size()/2);
-			if(res == ""){
-				alea += voyPond.size()/2;
-			}
-			res += voyPond[alea];
-			if(randomInt(4) == 0){
-				alea = randomInt(voyPond.size()/2);
-				if(!endsWith(res,voyPond[alea]) && !endsWith(res,voyPond[alea+voyPond.size()/2])){
-					res += voyPond[alea];
-				}
-			}
-		}else{
-			alea = randomInt(consPond.size()/2);
-			if(res == ""){
-				alea += consPond.size()/2;
-			}
-			res += consPond[alea];
-			if(consDoublables.find(consPond[alea]) != std::string::npos && randomInt(3) == 0){
-				alea = randomInt(consDoublantes.size()/2);
-				if(!endsWith(res,consPond[alea]) && !endsWith(res,consPond[alea+consPond.size()/2])){
-					res += consDoublantes[alea];
-				}
-			}
+	int nbSyllabes = randomInt(1, syllablesMax+1);
+	for(int i = 0;i < nbSyllabes;i++){
+		if(randomInt(2) == 0){
+			res += randomElement(allConsonants);
 		}
-		voyelle ^= true;
+		res += randomElement(allVowels);
+		if(randomInt(2) == 0){
+			res += randomElement(consonants);
+		}
 	}
+	res[0] = alphabet[alphabet.find(res[0])+alphabet.size()/2];
 	return res;
 }
 

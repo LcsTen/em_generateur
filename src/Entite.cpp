@@ -6,7 +6,7 @@ Entite::Entite(std::string nom,Entite* parent) : _nom(nom), _parent(parent) {
 	genererGentile(nom,&ms,&mp,&fs,&fp);
 }
 
-Entite::Entite(Entite* parent) : Entite(generateName(10),parent) {}
+Entite::Entite(Entite* parent) : Entite(generateName(3), parent) {}
 
 Entite::~Entite(){
 	for(unsigned int i = 0;i < enfants.size();i++){

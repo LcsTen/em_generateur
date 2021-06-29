@@ -113,7 +113,7 @@ StarSystem::StarSystem(std::string n) : name(n){
 	}
 }
 
-StarSystem::StarSystem() : StarSystem(generateName(10)){}
+StarSystem::StarSystem() : StarSystem(generateName(3)){}
 
 StarSystem::~StarSystem(){
 	for(size_t i = 0;i < stars.size();i++){
