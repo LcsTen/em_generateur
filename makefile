@@ -69,11 +69,11 @@ obj_dir = obj/$(lastword $(CXX))-$(target_type)
 $(shell mkdir -p $(obj_dir))
 
 sources := $(wildcard src/*.cpp)
+deps := $(sources:src/%.cpp=deps/%.d)
 ifneq ($(QT),0)
 	sources += src/moc_Backend.cpp
 endif
 objs := $(sources:src/%.cpp=$(obj_dir)/%.o)
-
 
 ### Rules
 
@@ -101,7 +101,7 @@ endif
 
 clean:
 	rm -f *.exe *.js *.wasm generateur-*
-	rm -rf obj
+	rm -rf obj deps
 
 ifneq ($(QT),0)
 src/moc_%.cpp: src/%.h
@@ -112,3 +112,9 @@ $(obj_dir)/Backend.o: src/Backend.moc
 src/Backend.moc: src/Backend.cpp
 	moc $(MOCFLAGS) -i $< -o $@
 endif
+
+deps/%.d: src/%.cpp
+	@ mkdir -p deps
+	$(CXX) -MM -MT '$$(obj_dir)/$*.o $@' -o $@ $<
+
+include $(deps)
