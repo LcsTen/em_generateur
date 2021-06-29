@@ -65,7 +65,7 @@ override GENERAL_CFLAGS += -DWEB=$(WEB) -DCONSOLE=$(CONSOLE) -DQT=$(QT)
 override CXXFLAGS += $(GENERAL_CFLAGS)
 MOCFLAGS = $(GENERAL_CFLAGS)
 
-obj_dir = obj/$(CXX)-$(target_type)
+obj_dir = obj/$(lastword $(CXX))-$(target_type)
 $(shell mkdir -p $(obj_dir))
 
 sources := $(wildcard src/*.cpp)
