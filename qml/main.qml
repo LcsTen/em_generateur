@@ -6,7 +6,9 @@ ApplicationWindow {
 	visible: true
 	width: 800
 	height: 800
-	property var categories: ["History", "Politics", "Ecology", "Calendar", "Space"]
+	property var categories: [Backend.getText("History"),
+		Backend.getText("Politics"), Backend.getText("Ecology"),
+		Backend.getText("Calendar"), Backend.getText("Space")]
 
 	function updateWorld(){
 		for(let i = 0;i < categories.length;i++){
@@ -40,13 +42,13 @@ ApplicationWindow {
 			}
 
 			Tab {
-				text: "Skip 10 years"
+				text: Backend.getText("Skip 10 years")
 
 				onClicked: console.log("TODO: Skip 10 years")
 			}
 
 			Tab {
-				text: "Generate a new world"
+				text: Backend.getText("Generate a new world")
 
 				onClicked: Backend.generateWorld()
 			}
@@ -69,9 +71,9 @@ ApplicationWindow {
 						// Politics
 						label.text = Backend.politicsToString();
 					}else if(index === 2){
-						label.text = "Ecology"
+						label.text = Backend.getText("Ecology")
 					}else if(index === 3){
-						label.text = "Calendar"
+						label.text = Backend.getText("Calendar")
 					}else if(index === 4){
 						// Space
 						label.text = Backend.spaceToString();
@@ -93,9 +95,9 @@ ApplicationWindow {
 							// Politics
 							Backend.politicsToHtml();
 						}else if(index === 2){
-							"Ecology"
+							Backend.getText("Ecology")
 						}else if(index === 3){
-							"Calendar"
+							Backend.getText("Calendar")
 						}else if(index === 4){
 							// Space
 							Backend.spaceToHtml();

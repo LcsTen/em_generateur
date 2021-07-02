@@ -12,6 +12,7 @@
 # CONSOLE: if not 0, build/run the console interface
 # If neither WEB nor CONSOLE is defined, the Qt-based desktop interface is built/run
 # DEBUG: if 1, build for debugging (keep debug info), else build for release (optimize)
+# LOCALIZE: if not 0, enable localization (requires a *working* libintl implementation)
 # TARGET: name of the generated executable (if WEB != 0, make sure that the name either ends with .wasm, .js or .html)
 # CXX: compiler to be used.
 # CXXFLAGS: additional flags to be passed to the compiler (the hardcoded flags takes priority though)
@@ -25,10 +26,15 @@ override CXXFLAGS += -Wall -Wextra -Wshadow -Werror
 DEBUG ?= 0
 ifeq ($(DEBUG),0)
 	override CXXFLAGS += -O2
+else
+	override CXXFLAGS += -g
 endif
 
 override CXXFLAGS += -std=c++11
 
+override LIBS += -lasprintf
+
+LOCALIZE ?= 1
 WEB ?= 0
 CONSOLE ?= 0
 QT ?= 0
@@ -42,11 +48,11 @@ ifneq ($(WEB),0)
 	CXX = em++
 	TARGET = index.js
 	override LDFLAGS += --emrun --bind
+	ifneq ($(LOCALIZE),0)
+		override LDFLAGS += --preload-file mo
+	endif
 else
 	CXX ?= g++
-	ifneq ($(DEBUG),0)
-		override CXXFLAGS += -g
-	endif
 	ifneq ($(CONSOLE),0)
 		target_type = console
 		TARGET = generateur-console
@@ -61,7 +67,7 @@ else
 		TARGET := $(TARGET).exe
 	endif
 endif
-override GENERAL_CFLAGS += -DWEB=$(WEB) -DCONSOLE=$(CONSOLE) -DQT=$(QT)
+override GENERAL_CFLAGS += -DWEB=$(WEB) -DCONSOLE=$(CONSOLE) -DQT=$(QT) -DLOCALIZE=$(LOCALIZE)
 override CXXFLAGS += $(GENERAL_CFLAGS)
 MOCFLAGS = $(GENERAL_CFLAGS)
 
@@ -75,11 +81,16 @@ ifneq ($(QT),0)
 endif
 objs := $(sources:src/%.cpp=$(obj_dir)/%.o)
 
+ifneq ($(LOCALIZE),0)
+	pos := $(wildcard po/*.po)
+	mos := $(pos:po/%.po=mo/%/LC_MESSAGES/generateur.mo)
+endif
+
 ### Rules
 
 .PHONY: all run clean
 
-all: $(TARGET)
+all: $(mos) $(TARGET)
 
 $(TARGET): $(objs)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
@@ -101,7 +112,7 @@ endif
 
 clean:
 	rm -f *.exe *.js *.wasm generateur-*
-	rm -rf obj deps
+	rm -rf obj deps mo
 
 ifneq ($(QT),0)
 src/moc_%.cpp: src/%.h
@@ -113,8 +124,19 @@ src/Backend.moc: src/Backend.cpp
 	moc $(MOCFLAGS) -i $< -o $@
 endif
 
+# When using -j and if the line of the message change in the source file, the
+# location information gets duplicated. the sed script removes the old location
+# information and keeps only the most recent one.
+po/%.po: $(sources)
+	xgettext -k_ -c~ $$([ -w $@ ] && echo "-j") -o $@ src/*.cpp
+	sed -i "s/#:.* \(.*\)/#: \1/" $@
+
+mo/%/LC_MESSAGES/generateur.mo: po/%.po
+	@ mkdir -p mo/$*/LC_MESSAGES
+	msgfmt -c -o $@ $<
+
 deps/%.d: src/%.cpp
 	@ mkdir -p deps
-	$(CXX) -MM -MT '$$(obj_dir)/$*.o $@' -o $@ $<
+	$(CXX) $(CXXFLAGS) -MM -MT '$$(obj_dir)/$*.o $@' -o $@ $<
 
 include $(deps)

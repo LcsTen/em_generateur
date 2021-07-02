@@ -1,0 +1,157 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-07-01 21:49+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. ~ %1$d is the index of the country in
+#. the list of countries of the world
+#. and %2$d is the index of the city in
+#. the list of cities of that country.
+#. Both are integer numbers, not names.
+#: src/Backend.cpp:76
+#, c-format
+msgid "Error: world[%1$d] has no city %2$d"
+msgstr "Erreur: monde[%1$d] n'a pas de ville %2$d"
+
+#. ~ %d is the index of the country in the list of
+#. countries of the world, it's a integer number, not a
+#. name.
+#: src/Backend.cpp:84
+#, c-format
+msgid "Error: the world has no country %d"
+msgstr "Erreur: le monde n'a pas de pays %d"
+
+#. ~ %1$d is the day (which may exceed 31), %2$d is the month (which may
+#. exceed 12) and %3$d is the year the world named %4$d is created.
+#: src/Backend.cpp:126
+#, c-format
+msgid "%1$d/%2$d/%3$d: The world %4$s is created."
+msgstr "%1$d/%2$d/%3$d: Le monde %4$s est créé."
+
+#. ~ %1$s is the name of the city, %2$d the population and %3$s the
+#. gentilic. It may be preferable to keep this minimalist description.
+#: src/Backend.cpp:156
+#, c-format
+msgid "%1$s (%2$d %3$s)"
+msgstr "%1$s (%2$d %3$s)"
+
+#. ~ %1$s is the name of the country, %2$d is the population, %3$d is the
+#. gentilic and %4$d is the number of cities.
+#: src/Backend.cpp:163
+#, c-format
+msgid "%1$s is a country populated by %2$d %3$s split in %4$d cities"
+msgstr "%1$s est un pays composé de %2$d %3$s répartis dans %4$d villes"
+
+#. ~ %1$ is the name of hte world, %2$d is the population, %3$d is the
+#. gentilic and %4$d is the number of countries.
+#: src/Backend.cpp:175
+#, c-format
+msgid "%1$s is a world populated by %2$d %3$s split in %4$d countries"
+msgstr "%1$s est un monde composé de %2$d %3$s répartis dans %4$d pays"
+
+#. ~ %s is the name of the planet, and "Gas" refers to its type (here, a
+#. gas giant).
+#: src/Backend.cpp:187
+#, c-format
+msgid "%s (Gas)"
+msgstr "%s (Gazeuse)"
+
+#. ~ %1$s is the name of the planet, "Telluric" refers to its type (here,
+#. a telluric planet, %2$d is its temperature in Kelvin in the coldest
+#. case and %3$d in the hottest case.
+#: src/Backend.cpp:216
+#, c-format
+msgid "%1$s (Telluric) [%2$d;%3$d]"
+msgstr "%1$s (Tellurique) [%2$d;%3$d]"
+
+#. ~ %1$s is the name of the stellar system, %2$d is the number of the
+#. stars in this stellar system.
+#: src/Backend.cpp:266
+#, c-format
+msgid "%1$s is a stellar system with %2$d stars"
+msgstr "%1$s est un système stellaire avec %2$d étoiles"
+
+#. ~ %1$s is the name of the star, %2$c is an alphabetic
+#. numbering (the first star is A, the second B...), %3$.2s is
+#. the class of the star (for example, our Sun is a G2 star)
+#. and %4$d is the temperature of the star in Kelvin.
+#: src/Backend.cpp:273
+#, c-format
+msgid "%1$s %2$c is a class %3$.2s star (%4$dK)"
+msgstr "%1$s %2$c est une étoile de classe %3$.2s (%4$dK)"
+
+#: src/Backend.cpp:291
+msgid "Circumbinaries"
+msgstr "Circumbinaires"
+
+#: src/main.cpp:158
+msgid "Show information about the world/country/city."
+msgstr "Affiche des informations sur le monde/le pays/la ville."
+
+#: src/main.cpp:159
+msgid "Generate a new world."
+msgstr "Génère un nouveau monde."
+
+#: src/main.cpp:160
+msgid "Show the world map."
+msgstr "Affiche la carte du monde."
+
+#: src/main.cpp:161
+msgid "Show information about space."
+msgstr "Affiche des informations sur l'espace."
+
+#: src/main.cpp:162
+msgid "Exit the REPL."
+msgstr "Quitte la REPL."
+
+#: src/main.cpp:163
+msgid "Display this help."
+msgstr "Affiche cette aide."
+
+#. ~ %s is the unknown command the user tried to use
+#: src/main.cpp:170
+#, c-format
+msgid "%s: unknown command."
+msgstr "%s: commande inconnue."
+
+#: src/main.cpp:78
+msgid "History"
+msgstr "Histoire"
+
+#: src/main.cpp:80
+msgid "Politics"
+msgstr "Politique"
+
+#: src/main.cpp:82
+msgid "Ecology"
+msgstr "Écologie"
+
+#: src/main.cpp:84
+msgid "Calendar"
+msgstr "Calendrier"
+
+#: src/main.cpp:86
+msgid "Space"
+msgstr "Espace"
+
+#: src/main.cpp:88
+msgid "Skip 10 years"
+msgstr "Passer 10 ans"
+
+#: src/main.cpp:90
+msgid "Generate a new world"
+msgstr "Générer un nouveau monde"

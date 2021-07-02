@@ -1,21 +1,24 @@
-sudo: required
-
 language: c++
 
 dist: "bionic"
 
 before_install:
-  - git clone https://github.com/emscripten-core/emsdk
-  - emsdk/emsdk install latest
-  - emsdk/emsdk activate latest
-  - . emsdk/emsdk_env.sh
-  - python3 --version
+        - git clone https://github.com/emscripten-core/emsdk
+        - emsdk/emsdk install latest
+        - emsdk/emsdk activate latest
+        - . emsdk/emsdk_env.sh
+        - em++ --version
+        - curl -o gettext-0.20.2.tar.gz https://ftp.gnu.org/pub/gnu/gettext/gettext-0.20.2.tar.gz
+        - tar -xf gettext-0.20.2.tar.gz
+        - cd gettext-0.20.2/gettext-runtime
+        - emconfigure ./configure
+        - make
+        - cd ../..
 
 script:
-    - make WEB=1 # Compile files
-    - rm -rf obj # Clean intermediate compilation files
-    - mkdir -p gh-pages # Create gh-pages directory (local-dir)
-    - mv index.{html,js,wasm} img gh-pages # Move the resulting files to that directory
+        - make WEB=1 CXXFLAGS=-Igettext-0.20.2/gettext-runtime/libasprintf LDFLAGS="-Lgettext-0.20.2/gettext-runtime/libasprintf/.libs -Lgettext-0.20.2/gettext-runtime/intl/.libs" LIBS=-lgnuintl # Compile files
+        - mkdir -p gh-pages # Create gh-pages directory (local-dir)
+        - mv index.{html,js,wasm,data} img gh-pages # Move the resulting files to that directory
 
 deploy:
   provider: pages

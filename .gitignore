@@ -1,5 +1,6 @@
 main
 generateur-*
+mo/
 obj/
 *.o
 *.stackdump
@@ -8,3 +9,4 @@ obj/
 *.exe
 *.d
 *.moc
+*.data

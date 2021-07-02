@@ -33,7 +33,7 @@ class Backend
 	Q_OBJECT
 
 	public:
-		Backend();
+		Q_INVOKABLE STRING_TYPE getText(STRING_TYPE message);
 
 		Q_INVOKABLE STRING_TYPE politicsToString(int index_country = -1, int index_city = -1);
 		Q_INVOKABLE STRING_TYPE spaceToString();

@@ -4,6 +4,15 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <autosprintf.h>
+
+#if LOCALIZE != 0
+	#include <libintl.h>
+	#include <locale.h>
+	#define _(string, ...) gnu::autosprintf(gettext(string), ##__VA_ARGS__)
+#else
+	#define _(string, ...) gnu::autosprintf(string, ##__VA_ARGS__)
+#endif
 
 int randomInt(int min,int max);
 
@@ -18,6 +27,10 @@ std::string generateName(int syllablesMax);
 std::string format(int a);
 
 std::string operator+(std::string a,int b);
+
+std::string operator+(gnu::autosprintf a, std::string b);
+
+std::string operator+(std::string a, gnu::autosprintf b);
 
 #if QT != 0
 #include <QString>

@@ -40,11 +40,22 @@
 	#define _LI ""
 #endif
 
-Backend::Backend(){
-	generateWorld();
+#if QT == 0
+	#define TO_STRING_TYPE(string) string
+	#define FROM_STRING_TYPE(string) string
+#else
+	#define TO_STRING_TYPE(string) QString::fromStdString(string)
+	#define FROM_STRING_TYPE(string) string.toStdString()
+#endif
+
+STRING_TYPE Backend::getText(STRING_TYPE message){
+	return TO_STRING_TYPE(_(FROM_STRING_TYPE(message).c_str()));
 }
 
 STRING_TYPE Backend::politicsToString(int index_country, int index_city){
+	if(monde == nullptr){
+		return STRING_TYPE();
+	}
 	std::string res;
 	if(index_country <= -1){
 		res = entiteToString(monde);
@@ -57,27 +68,30 @@ STRING_TYPE Backend::politicsToString(int index_country, int index_city){
 				if(index_city < country->getNbEnfants()){
 					res = entiteToString((Ville*)country->getEnfant(index_city));
 				}else{
-					res = std::string("Error: monde[")+index_country+"] has no child "+index_city+BR;
+					/*~ %1$d is the index of the country in
+					    the list of countries of the world
+					    and %2$d is the index of the city in
+					    the list of cities of that country.
+					    Both are integer numbers, not names. */
+					res = _("Error: world[%1$d] has no city %2$d",
+						index_country, index_city)+BR;
 				}
 			}
 		}else{
-			res = std::string("Error: monde has no child ")+index_country+BR;
+			/*~ %d is the index of the country in the list of
+			    countries of the world, it's a integer number, not a
+			    name. */
+			res = _("Error: the world has no country %d", index_country)+BR;
 		}
 	}
-	#if QT == 0
-		return res;
-	#else
-		return QString::fromStdString(res);
-	#endif
+	return TO_STRING_TYPE(res);
 }
 
 STRING_TYPE Backend::spaceToString(){
-	std::string res = spaceToString(space);
-	#if QT == 0
-		return res;
-	#else
-		return QString::fromStdString(res);
-	#endif
+	if(space == nullptr){
+		return STRING_TYPE();
+	}
+	return TO_STRING_TYPE(spaceToString(space));
 }
 
 // TODO: Port to HTML4
@@ -107,7 +121,10 @@ void Backend::generateWorld(){
 	}
 	monde = new Monde(habitables[0]->getName());
 	emit worldChanged();
-	emit logPrinted(STRING_TYPE()+"1/1/1: The world "+monde->getNom()+" is created.");
+	/*~ %1$d is the day (which may exceed 31), %2$d is the month (which may
+	    exceed 12) and %3$d is the year the world named %4$d is created. */
+	std::string log = _("%1$d/%2$d/%3$d: The world %4$s is created.", 1, 1, 1, monde->getNom().c_str());
+	emit logPrinted(TO_STRING_TYPE(log));
 }
 
 void Backend::onWorldChanged(std::function<void()> f){
@@ -134,11 +151,18 @@ void Backend::logPrinted(std::string log){
 
 std::string Backend::entiteToString(Ville* ville, int depth){
 	(void)depth; // Silence unused depth parameter for non-CONSOLE builds
-	return INDENT(depth)+ville->getNom()+" ("+ville->getPopulation()+" "+ville->getGent(MP)+")";
+	/*~ %1$s is the name of the city, %2$d the population and %3$s the
+	    gentilic. It may be preferable to keep this minimalist description. */
+	return INDENT(depth)+_("%1$s (%2$d %3$s)", ville->getNom().c_str(),
+			       ville->getPopulation(), ville->getGent(MP).c_str());
 }
 
 std::string Backend::entiteToString(Pays* pays, int depth){
-	std::string res = H2(depth)+pays->getNom()+_H2(depth)+pays->getNom()+" est un pays composé de "+pays->getPopulation()+' '+pays->getGent(MP)+" répartis dans "+pays->getNbEnfants()+" villes:" BR;
+	/*~ %1$s is the name of the country, %2$d is the population, %3$d is the
+	    gentilic and %4$d is the number of cities. */
+	std::string res = H2(depth)+pays->getNom()+_H2(depth)+_("%1$s is a country populated by %2$d %3$s split in %4$d cities",
+		  pays->getNom().c_str(), pays->getPopulation(),
+		  pays->getGent(MP).c_str(), pays->getNbEnfants())+':'+BR;
 	for(int i = 0;i < pays->getNbEnfants();i++){
 		res += entiteToString((Ville*)pays->getEnfant(i), depth+1)+BR;
 	}
@@ -146,7 +170,11 @@ std::string Backend::entiteToString(Pays* pays, int depth){
 }
 
 std::string Backend::entiteToString(Monde* m, int depth){
-	std::string res = H1(depth)+m->getNom()+_H1(depth)+m->getNom()+" est un monde composé de "+m->getPopulation()+' '+m->getGent(MP)+" répartis dans "+m->getNbEnfants()+" pays:" BR;
+	/*~ %1$ is the name of hte world, %2$d is the population, %3$d is the
+	    gentilic and %4$d is the number of countries. */
+	std::string res = H1(depth)+m->getNom()+_H1(depth)+_("%1$s is a world populated by %2$d %3$s split in %4$d countries",
+		  m->getNom().c_str(), m->getPopulation(),
+		  m->getGent(MP).c_str(), m->getNbEnfants())+':'+BR;
 	for(int i = 0;i < m->getNbEnfants();i++){
 		res += entiteToString((Pays*)m->getEnfant(i), depth+1)+BR;
 	}
@@ -154,7 +182,9 @@ std::string Backend::entiteToString(Monde* m, int depth){
 }
 
 std::string Backend::spaceToString(GasPlanet* g){
-	return g->getName()+" (Gas)";
+	/*~ %s is the name of the planet, and "Gas" refers to its type (here, a
+	    gas giant). */
+	return _("%s (Gas)", g->getName().c_str());
 }
 
 std::string Backend::spaceToString(TelluricPlanet* t){
@@ -180,7 +210,11 @@ std::string Backend::spaceToString(TelluricPlanet* t){
 		// Temperature is too cold in the coldest case
 		res += CYAN;
 	}
-	res += t->getName()+" (Telluric) ["+coldest+';'+hottest+"]" _COLOR;
+	/*~ %1$s is the name of the planet, "Telluric" refers to its type (here,
+	    a telluric planet, %2$d is its temperature in Kelvin in the coldest
+	    case and %3$d in the hottest case. */
+	res += _("%1$s (Telluric) [%2$d;%3$d]", t->getName().c_str(), coldest,
+		 hottest)+_COLOR;
 	return res;
 }
 
@@ -227,9 +261,19 @@ std::string Backend::spaceToString(StarSystem* s){
 	}
 	std::sort(circumbinaries.begin(),circumbinaries.end(),cmp);
 
-	std::string res = H1(0)+s->getName()+_H1(0)+s->getName()+" is a stellar system with "+stars.size()+" stars:" UL;
+	/*~ %1$s is the name of the stellar system, %2$d is the number of the
+	    stars in this stellar system. */
+	std::string res = H1(0)+s->getName()+_H1(0)+_("%1$s is a stellar system with %2$d stars",
+		  s->getName().c_str(), stars.size())+':'+UL;
 	for(size_t i = 0;i < stars.size();i++){
-		res += LI(1)+s->getName()+" "+((char)('A'+i))+" is a class "+stars[i]->getStarClass()[0]+stars[i]->getStarClass()[1]+" star ("+stars[i]->getTemperature()+"K)" UL;
+		/*~ %1$s is the name of the star, %2$c is an alphabetic
+		    numbering (the first star is A, the second B...), %3$.2s is
+		    the class of the star (for example, our Sun is a G2 star)
+		    and %4$d is the temperature of the star in Kelvin. */
+		res += LI(1)+_("%1$s %2$c is a class %3$.2s star (%4$dK)",
+			       s->getName().c_str(), (char)('A'+i),
+			       stars[i]->getStarClass(),
+			       stars[i]->getTemperature())+UL;
 		for(size_t j = 0;j < planets[i].size();j++){
 			World* planet = planets[i][j].second;
 			size_t planetIndex = planets[i][j].first;
@@ -244,7 +288,7 @@ std::string Backend::spaceToString(StarSystem* s){
 	}
 	res += _UL BR;
 	if(stars.size() > 1){
-		res += "Circumbinaries:";
+		res += _("Circumbinaries")+":";
 	}
 	res += UL;
 	for(size_t i = 0;i < circumbinaries.size();i++){

@@ -16,6 +16,17 @@
 
 Backend backend;
 
+void init(){
+	setlocale(LC_ALL, "");
+	srand(time(NULL));
+	if(bindtextdomain("generateur", "mo") == nullptr){
+		perror("bindtextdomain");
+	}
+	if(textdomain("generateur") == nullptr){
+		perror("textdomain");
+	}
+}
+
 #if WEB != 0
 
 #include <emscripten.h>
@@ -29,23 +40,22 @@ emscripten::val operator""_val(const char* s,size_t){
 
 void mainLoop(){}
 
-void update(){
+emscripten::val querySelector(std::string sel){
 	emscripten::val document = emscripten::val::global("document");
+	return document.call<emscripten::val>("querySelector", sel);
+}
 
-	emscripten::val politics = document.call<emscripten::val>("querySelector","#politics"_val);
-	politics.set("innerHTML",backend.politicsToString());
-
-	emscripten::val spaceDiv = document.call<emscripten::val>("querySelector","#space"_val);
-	spaceDiv.set("innerHTML",backend.spaceToString());
-
-	emscripten::val::global("document").call<emscripten::val>("querySelector","#log"_val).set("innerHTML","");
+void update(){
+	querySelector("#politics").set("innerHTML",backend.politicsToString());
+	querySelector("#space").set("innerHTML",backend.spaceToString());
+	querySelector("#log").set("innerHTML","");
 }
 
 void log(std::string s){
 	emscripten::val document = emscripten::val::global("document");
 	emscripten::val li = document.call<emscripten::val>("createElement","li"_val);
 	li.set("innerHTML",s);
-	document.call<emscripten::val>("querySelector","#log"_val).call<void>("append",li);
+	querySelector("#log").call<void>("append", li);
 }
 
 EM_BOOL generate_world_click(int /*eventType*/,const EmscriptenMouseEvent* /*e*/,void* /*userData*/){
@@ -54,18 +64,32 @@ EM_BOOL generate_world_click(int /*eventType*/,const EmscriptenMouseEvent* /*e*/
 }
 
 int main(){
+	init();
+
 	emscripten_set_mousedown_callback("#generate_world",NULL,false,generate_world_click);
 
 	emscripten_set_main_loop(mainLoop,-1,0);
-	
-	srand(time(NULL));
+
 	backend.onWorldChanged(update);
 	backend.onLogPrinted(log);
 	backend.generateWorld();
 
-	emscripten::val document = emscripten::val::global("document");
-	document.call<emscripten::val>("querySelector","#splash"_val)["style"].set("display", "none");
-	document.call<emscripten::val>("querySelector","#display"_val)["style"].set("display", "block");
+	emscripten::val tab = querySelector("#history_tab");
+	tab.set("innerText", std::string(_("History")));
+	tab = querySelector("#politics_tab");
+	tab.set("innerText", std::string(_("Politics")));
+	tab = querySelector("#ecology_tab");
+	tab.set("innerText", std::string(_("Ecology")));
+	tab = querySelector("#calendar_tab");
+	tab.set("innerText", std::string(_("Calendar")));
+	tab = querySelector("#space_tab");
+	tab.set("innerText", std::string(_("Space")));
+	tab = querySelector("#skip_turn");
+	tab.set("innerText", std::string(_("Skip 10 years")));
+	tab = querySelector("#generate_world");
+	tab.set("innerText", std::string(_("Generate a new world")));
+	querySelector("#splash")["style"].set("display", "none");
+	querySelector("#display")["style"].set("display", "block");
 }
 
 #endif // WEB != 1
@@ -78,7 +102,7 @@ int main(){
 #include <QQmlContext>
 
 int main(int argc, char** argv){
-	srand(time(NULL));
+	init();
 	QGuiApplication app(argc, argv);
 	const QUrl url("qml/main.qml");
 	QQmlApplicationEngine engine;
@@ -104,7 +128,7 @@ std::string politicsToString(std::vector<std::string> args){
 }
 
 int main(){
-	srand(time(NULL));
+	init();
 	backend.generateWorld();
 	bool stop = false;
 	std::string arg;
@@ -131,18 +155,19 @@ int main(){
 		}else if(argv[0] == "gen"){
 			backend.generateWorld();
 		}else if(argv[0] == "help"){
-			std::cout << "politics [id_country [id_city]]" << std::endl << "\tShow information about the world/country/city."
-				<< std::endl << std::endl << "gen" << std::endl << "\tGenerate a new world."
-				<< std::endl << std::endl << "map" << std::endl << "\tShow the world map."
-				<< std::endl << std::endl << "space" << std::endl << "\tShow information about space."
-				<< std::endl << std::endl << "stop" << std::endl << "\tExit the REPL."
-				<< std::endl << std::endl << "help" << std::endl << "\tDisplay this help." << std::endl;
+			std::cout << "politics [id_country [id_city]]" << std::endl << '\t' << _("Show information about the world/country/city.")
+				<< std::endl << std::endl << "gen" << std::endl << '\t' << _("Generate a new world.")
+				<< std::endl << std::endl << "map" << std::endl << '\t' << _("Show the world map.")
+				<< std::endl << std::endl << "space" << std::endl << '\t' << _("Show information about space.")
+				<< std::endl << std::endl << "stop" << std::endl << '\t' << _("Exit the REPL.")
+				<< std::endl << std::endl << "help" << std::endl << '\t' << _("Display this help.") << std::endl;
 		}else if(argv[0] == "map"){
 			std::cout << backend.mapToString() << std::endl;
 		}else if(argv[0] == "space"){
 			std::cout << backend.spaceToString() << std::endl;
 		}else if(argv[0] != ""){
-			std::cout << argv[0]+": unknown command." << std::endl;
+			//~ %s is the unknown command the user tried to use
+			std::cout << _("%s: unknown command.", argv[0].c_str()) << std::endl;
 		}
 		if(!stop){
 			std::cout << "generateur$ ";
