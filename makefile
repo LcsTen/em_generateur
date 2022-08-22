@@ -137,6 +137,6 @@ mo/%/LC_MESSAGES/generateur.mo: po/%.po
 
 deps/%.d: src/%.cpp
 	@ mkdir -p deps
-	$(CXX) $(CXXFLAGS) -MM -MT '$$(obj_dir)/$*.o $@' -o $@ $<
+	$(CXX) $(CXXFLAGS) -DQT=0 -MM -MT '$$(obj_dir)/$*.o $@' -o $@ $<
 
 include $(deps)
