@@ -2,11 +2,11 @@ main
 generateur-*
 mo/
 obj/
+mocs/
 *.o
 *.stackdump
 *.js
 *.wasm
 *.exe
 *.d
-*.moc
 *.data

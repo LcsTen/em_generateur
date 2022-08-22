@@ -306,5 +306,5 @@ std::string Backend::spaceToString(StarSystem* s){
 }
 
 #if QT != 0
-	#include "Backend.moc"
+	#include "../mocs/Backend.moc"
 #endif

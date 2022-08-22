@@ -77,6 +77,7 @@ $(shell mkdir -p $(obj_dir))
 sources := $(wildcard src/*.cpp)
 deps := $(sources:src/%.cpp=deps/%.d)
 ifneq ($(QT),0)
+        $(shell mkdir -p mocs)
 	sources += src/moc_Backend.cpp
 endif
 objs := $(sources:src/%.cpp=$(obj_dir)/%.o)
@@ -112,15 +113,15 @@ endif
 
 clean:
 	rm -f *.exe *.js *.wasm generateur-*
-	rm -rf obj deps mo
+	rm -rf obj deps mo mocs
 
 ifneq ($(QT),0)
 src/moc_%.cpp: src/%.h
 	moc $(MOCFLAGS) $< -o $@
 
-$(obj_dir)/Backend.o: src/Backend.moc
+$(obj_dir)/Backend.o: mocs/Backend.moc
 
-src/Backend.moc: src/Backend.cpp
+mocs/%.moc: src/%.cpp
 	moc $(MOCFLAGS) -i $< -o $@
 endif
 
