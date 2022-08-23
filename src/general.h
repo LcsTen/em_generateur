@@ -4,14 +4,13 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <autosprintf.h>
 
 #if LOCALIZE != 0
 	#include <libintl.h>
 	#include <locale.h>
-	#define _(string, ...) gnu::autosprintf(gettext(string), ##__VA_ARGS__)
+	#define _(string, ...) format(gettext(string), ##__VA_ARGS__)
 #else
-	#define _(string, ...) gnu::autosprintf(string, ##__VA_ARGS__)
+	#define _(string, ...) format(string, ##__VA_ARGS__)
 #endif
 
 int randomInt(int min,int max);
@@ -26,11 +25,10 @@ std::string generateName(int syllablesMax);
 
 std::string format(int a);
 
+template<typename... Args>
+std::string format(const std::string& fmt, Args... args);
+
 std::string operator+(std::string a,int b);
-
-std::string operator+(gnu::autosprintf a, std::string b);
-
-std::string operator+(std::string a, gnu::autosprintf b);
 
 #if QT != 0
 #include <QString>
@@ -46,5 +44,7 @@ template<typename T>
 typename T::value_type randomElement(const T& container){
 	return container[randomInt(container.size())];
 }
+
+#include "general.tpp"
 
 #endif // general_h

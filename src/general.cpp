@@ -289,14 +289,6 @@ std::string operator+(std::string a,int b){
 	return a+format(b);
 }
 
-std::string operator+(gnu::autosprintf a, std::string b){
-	return a.operator std::string()+b;
-}
-
-std::string operator+(std::string a, gnu::autosprintf b){
-	return a+b.operator std::string();
-}
-
 #if QT != 0
 QString operator+(QString a, std::string b){
 	return a+QString::fromStdString(b);

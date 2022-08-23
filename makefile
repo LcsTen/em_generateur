@@ -30,9 +30,7 @@ else
 	override CXXFLAGS += -g
 endif
 
-override CXXFLAGS += -std=c++11
-
-override LIBS += -lasprintf
+override CXXFLAGS += -std=c++20
 
 LOCALIZE ?= 1
 WEB ?= 0
