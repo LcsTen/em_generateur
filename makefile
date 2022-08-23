@@ -21,7 +21,9 @@
 
 ### Variables
 
-override CXXFLAGS += -Wall -Wextra -Wshadow -Werror
+# format-security will warn because in fmt parameter in format function is used
+# as format parameter in snprintf.
+override CXXFLAGS += -Wall -Wextra -Wshadow -Werror -Wno-format-security
 
 DEBUG ?= 0
 ifeq ($(DEBUG),0)
@@ -45,7 +47,10 @@ ifneq ($(WEB),0)
 	target_type = web
 	CXX = em++
 	TARGET = index.js
-	override LDFLAGS += --emrun --bind
+	override LDFLAGS += --bind
+	# This is needed, because for some reasons I can't understand runtime
+	# complains about a native symbol which isn't exported
+	override LDFLAGS += -sEXPORTED_FUNCTIONS=_main,_emscripten_builtin_memalign
 	ifneq ($(LOCALIZE),0)
 		override LDFLAGS += --preload-file mo
 	endif

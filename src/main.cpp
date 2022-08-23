@@ -51,7 +51,7 @@ void update(){
 	querySelector("#log").set("innerHTML","");
 }
 
-void log(std::string s){
+void logThing(std::string s){
 	emscripten::val document = emscripten::val::global("document");
 	emscripten::val li = document.call<emscripten::val>("createElement","li"_val);
 	li.set("innerHTML",s);
@@ -71,7 +71,7 @@ int main(){
 	emscripten_set_main_loop(mainLoop,-1,0);
 
 	backend.onWorldChanged(update);
-	backend.onLogPrinted(log);
+	backend.onLogPrinted(logThing);
 	backend.generateWorld();
 
 	emscripten::val tab = querySelector("#history_tab");
