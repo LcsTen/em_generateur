@@ -7,7 +7,9 @@ pipeline:
                         - em++ --version
                         - make WEB=1
                 when:
-                        event: [pull_request, push]
+                        - event: pull_request
+                        - event: push
+                          branch: master
 
         publish-web:
                 image: archlinux:base-devel
@@ -24,6 +26,9 @@ pipeline:
                         - git push
                 when:
                         event: push
+                        branch: master
 
-branches:
-        exclude: [pages]
+when:
+        - event: pull_request
+        - event: push
+          branch: master
