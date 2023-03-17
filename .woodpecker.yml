@@ -6,10 +6,6 @@ pipeline:
                         - source /etc/profile.d/emscripten.sh
                         - em++ --version
                         - make WEB=1
-                when:
-                        - event: pull_request
-                        - event: push
-                          branch: master
 
         publish-web:
                 image: archlinux:base-devel
@@ -19,11 +15,11 @@ pipeline:
                         - git config --global user.email $MAIL
                         - git config --global user.name "Codeberg CI"
                         - git clone -b pages https://$CODEBERG_TOKEN@codeberg.org/$CI_REPO.git $CI_REPO_NAME
+                        - rm -rf $CI_REPO_NAME/*
                         - mv index.{html,js,wasm,data} img $CI_REPO_NAME
                         - cd $CI_REPO_NAME
                         - git add .
-                        - git commit -m "Codeberg CI $CI_BUILD_CREATED"
-                        - git push
+                        - git commit -m "Codeberg CI $CI_BUILD_CREATED" && git push || true # Do not fail if there are no changes
                 when:
                         event: push
                         branch: master
